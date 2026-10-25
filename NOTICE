@@ -7,3 +7,12 @@ The MinIO project contains unmodified/modified subcomponents too with
 separate copyright notices and license terms. Your use of the source
 code for these subcomponents is subject to the terms and conditions
 of GNU Affero General Public License 3.0.
+
+This repository derives from MinIO, Copyright (c) 2015-2025 MinIO, Inc.
+Upstream: https://github.com/minio/minio
+Origin commit: 9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a
+
+Licensed under the GNU Affero General Public License, version 3 (AGPLv3).
+The complete upstream LICENSE and existing file copyright notices are preserved.
+Fork maintenance updates dependencies, build tooling and test diagnostics.
+Third-party dependencies retain their respective licenses and copyright notices.

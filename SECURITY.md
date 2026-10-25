@@ -1,42 +1,35 @@
-# Security Policy
+# Security policy
 
-## Supported Versions
+## Report a vulnerability privately
 
-We always provide security updates for the [latest release](https://github.com/minio/minio/releases/latest).
-Whenever there is a security update you just need to upgrade to the latest version.
+**Reporting channel: open a support ticket at https://portal.imprezahost.com/submitticket.php**
+(the portal is also reachable over its onion address). Mark it as a security report.
 
-## Reporting a Vulnerability
+Do not post exploit details or sensitive information in public issues.
 
-All security bugs in [minio/minio](https://github,com/minio/minio) (or other minio/* repositories)
-should be reported by email to security@min.io. Your email will be acknowledged within 48 hours,
-and you'll receive a more detailed response to your email within 72 hours indicating the next steps
-in handling your report.
+A useful report includes the source commit, build toolchain, affected configuration,
+expected behavior and a minimal reproduction with synthetic data. Omit credentials,
+access keys, customer data, private endpoints and identifying infrastructure details.
+The maintainer will arrange any sensitive evidence through the selected channel.
 
-Please, provide a detailed explanation of the issue. In particular, outline the type of the security
-issue (DoS, authentication bypass, information disclose, ...) and the assumptions you're making (e.g. do
-you need access credentials for a successful exploit).
+## Handling and updates
 
-If you have not received a reply to your email within 48 hours or you have not heard from the security team
-for the past five days please contact the security team directly:
+The maintainer will assess impact, reproduce reports in isolation and coordinate
+fixes and disclosure with reporters. No response deadline or support window is
+promised before the public maintenance policy is announced. Availability of source
+or a reproducible build does not mean a report has been resolved.
 
-- Primary security coordinator: aead@min.io
-- Secondary coordinator: harsha@min.io
-- If you receive no response: dev@min.io
+Use releases and checksums announced by this fork's maintainer. Upstream update
+feeds do not identify this fork. The build recipe requires Go 1.26.10 and the
+tracked dependency lock. Check both source and executable with a current,
+independently obtained vulnerability database, recording its timestamp.
+Retain all findings and assess reachability; no clean-scanner claim is made here.
 
-### Disclosure Process
+## Scope
 
-MinIO uses the following disclosure process:
+This policy covers the maintained fork and its build tooling. Deployment security
+also depends on authentication, authorization, TLS, encryption configuration,
+network access and backups chosen by the operator. Do not use a production system
+or another person's data to demonstrate a vulnerability.
 
-1. Once the security report is received one member of the security team tries to verify and reproduce
-   the issue and determines the impact it has.
-2. A member of the security team will respond and either confirm or reject the security report.
-   If the report is rejected the response explains why.
-3. Code is audited to find any potential similar problems.
-4. Fixes are prepared for the latest release.
-5. On the date that the fixes are applied a security advisory will be published on <https://blog.min.io>.
-   Please inform us in your report email whether MinIO should mention your contribution w.r.t. fixing
-   the security issue. By default MinIO will **not** publish this information to protect your privacy.
-
-This process can take some time, especially when coordination is required with maintainers of other projects.
-Every effort will be made to handle the bug in as timely a manner as possible, however it's important that we
-follow the process described above to ensure that disclosures are handled consistently.
+License and attribution notices are preserved in LICENSE, NOTICE and the source.
