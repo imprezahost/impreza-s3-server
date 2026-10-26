@@ -68,7 +68,6 @@ const (
 	storageMetricReadXL
 	storageMetricReadAll
 	storageMetricStatInfoFile
-	storageMetricReadMultiple
 	storageMetricDeleteAbandonedParts
 	storageMetricDiskInfo
 	storageMetricDeleteBulk
@@ -714,28 +713,18 @@ func (p *xlStorageDiskIDCheck) StatInfoFile(ctx context.Context, volume, path st
 }
 
 func (p *xlStorageDiskIDCheck) ReadParts(ctx context.Context, volume string, partMetaPaths ...string) ([]*ObjectPartInfo, error) {
-	ctx, done, err := p.TrackDiskHealth(ctx, storageMetricReadParts, volume, path.Dir(partMetaPaths[0]))
+	// Merely for tracing storage
+	partPath := ""
+	if len(partMetaPaths) > 0 {
+		partPath = path.Dir(partMetaPaths[0])
+	}
+	ctx, done, err := p.TrackDiskHealth(ctx, storageMetricReadParts, volume, partPath)
 	if err != nil {
 		return nil, err
 	}
 	defer done(0, &err)
 
 	return p.storage.ReadParts(ctx, volume, partMetaPaths...)
-}
-
-// ReadMultiple will read multiple files and send each files as response.
-// Files are read and returned in the given order.
-// The resp channel is closed before the call returns.
-// Only a canceled context will return an error.
-func (p *xlStorageDiskIDCheck) ReadMultiple(ctx context.Context, req ReadMultipleReq, resp chan<- ReadMultipleResp) (err error) {
-	ctx, done, err := p.TrackDiskHealth(ctx, storageMetricReadMultiple, req.Bucket, req.Prefix)
-	if err != nil {
-		xioutil.SafeClose(resp)
-		return err
-	}
-	defer done(0, &err)
-
-	return p.storage.ReadMultiple(ctx, req, resp)
 }
 
 // CleanAbandonedData will read metadata of the object on disk

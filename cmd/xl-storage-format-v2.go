@@ -1590,6 +1590,13 @@ func (x *xlMetaV2) UpdateObjectVersion(fi FileInfo) error {
 
 // AddVersion adds a new version
 func (x *xlMetaV2) AddVersion(fi FileInfo) error {
+	// Refuse to persist metadata no shard size can be derived from. This is the
+	// single funnel every version write passes through, so rejecting here keeps
+	// the poison off disk rather than relying on every reader to cope with it.
+	if fi.HasNegativePartSize() {
+		return errFileCorrupt
+	}
+
 	if fi.VersionID == "" {
 		// this means versioning is not yet
 		// enabled or suspend i.e all versions

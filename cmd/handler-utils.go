@@ -83,7 +83,6 @@ var supportedHeaders = []string{
 	xhttp.AmzStorageClass,
 	xhttp.AmzObjectTagging,
 	"expires",
-	xhttp.AmzBucketReplicationStatus,
 	"X-Minio-Replication-Server-Side-Encryption-Sealed-Key",
 	"X-Minio-Replication-Server-Side-Encryption-Seal-Algorithm",
 	"X-Minio-Replication-Server-Side-Encryption-Iv",
@@ -142,7 +141,62 @@ var userMetadataKeyPrefixes = []string{
 
 // extractMetadataFromReq extracts metadata from HTTP header and HTTP queryString.
 func extractMetadataFromReq(ctx context.Context, r *http.Request) (metadata map[string]string, err error) {
-	return extractMetadata(ctx, textproto.MIMEHeader(r.Form), textproto.MIMEHeader(r.Header))
+	metadata, err = extractMetadata(ctx, textproto.MIMEHeader(r.Form), textproto.MIMEHeader(r.Header))
+	if err != nil {
+		return nil, err
+	}
+
+	// Keep the metadata consumed by object operations in lock-step with policy
+	// conditions: an explicitly present header wins, otherwise use the query
+	// value accepted by the existing S3-compatible request path.
+	for _, name := range []string{xhttp.AmzStorageClass, xhttp.AmzObjectTagging} {
+		if value, ok := getRequestHeaderOrQueryValue(r, name); ok {
+			metadata[name] = value
+		}
+	}
+	return metadata, nil
+}
+
+// getRequestHeaderOrQueryValue returns the effective value of a request field.
+// Header presence takes precedence even when its value is empty. Query lookup
+// remains case-insensitive for compatibility with extractMetadataFromReq.
+func getRequestHeaderOrQueryValue(r *http.Request, name string) (string, bool) {
+	if values, ok := getRequestValues(r.Header, name, http.CanonicalHeaderKey(name)); ok {
+		return strings.Join(values, ","), true
+	}
+	if values, ok := getRequestValues(http.Header(r.Form), name, strings.ToLower(name)); ok {
+		return strings.Join(values, ","), true
+	}
+	return "", false
+}
+
+func getRequestValues(values http.Header, name, preferred string) ([]string, bool) {
+	if value, ok := values[preferred]; ok {
+		return value, true
+	}
+
+	canonical, lower := http.CanonicalHeaderKey(name), strings.ToLower(name)
+	for _, key := range []string{canonical, lower} {
+		if key == preferred {
+			continue
+		}
+		if value, ok := values[key]; ok {
+			return value, true
+		}
+	}
+
+	// Multiple differently-cased spellings are malformed but were previously
+	// accepted. Pick one deterministically instead of depending on map order.
+	match := ""
+	for key := range values {
+		if strings.EqualFold(key, name) && (match == "" || key < match) {
+			match = key
+		}
+	}
+	if match != "" {
+		return values[match], true
+	}
+	return nil, false
 }
 
 func extractMetadata(ctx context.Context, mimesHeader ...textproto.MIMEHeader) (metadata map[string]string, err error) {
@@ -192,6 +246,16 @@ func extractMetadata(ctx context.Context, mimesHeader ...textproto.MIMEHeader) (
 
 // extractMetadata extracts metadata from map values.
 func extractMetadataFromMime(ctx context.Context, v textproto.MIMEHeader, m map[string]string) error {
+	return extractMetadataFromMimeWithReplication(ctx, v, m, false)
+}
+
+// extractReplicationMetadataFromMime restores replication-only metadata after the
+// caller has validated that the request is a trusted replication write.
+func extractReplicationMetadataFromMime(ctx context.Context, v textproto.MIMEHeader, m map[string]string) error {
+	return extractMetadataFromMimeWithReplication(ctx, v, m, true)
+}
+
+func extractMetadataFromMimeWithReplication(ctx context.Context, v textproto.MIMEHeader, m map[string]string, allowReplication bool) error {
 	if v == nil {
 		bugLogIf(ctx, errInvalidArgument)
 		return errInvalidArgument
@@ -208,6 +272,9 @@ func extractMetadataFromMime(ctx context.Context, v textproto.MIMEHeader, m map[
 		value, ok := nv[http.CanonicalHeaderKey(supportedHeader)]
 		if ok {
 			if v, ok := replicationToInternalHeaders[supportedHeader]; ok {
+				if !allowReplication {
+					continue
+				}
 				m[v] = strings.Join(value, ",")
 			} else {
 				m[supportedHeader] = strings.Join(value, ",")
@@ -264,7 +331,7 @@ func extractReqParams(r *http.Request) map[string]string {
 		m["range"] = rangeField
 	}
 
-	if _, ok := r.Header[xhttp.MinIOSourceReplicationRequest]; ok {
+	if isTrustedReplication(r.Context()) {
 		m[xhttp.MinIOSourceReplicationRequest] = ""
 	}
 	return m

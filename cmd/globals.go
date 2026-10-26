@@ -188,8 +188,8 @@ var (
 	// Indicates if server code should go through testing path.
 	globalIsTesting = false
 
-	// This flag is set to 'true' by default
-	globalBrowserEnabled = true
+	// Keep the Console disabled unless the operator explicitly opts in.
+	globalBrowserEnabled = false
 
 	// Custom browser redirect URL, not set by default
 	// and it is automatically deduced.

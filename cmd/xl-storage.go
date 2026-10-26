@@ -788,6 +788,22 @@ func (s *xlStorage) getVolDir(volume string) (string, error) {
 	if volume == "" || volume == "." || volume == ".." {
 		return "", errVolumeNotFound
 	}
+	// Reject traversal smuggled inside the volume name itself, e.g. "../" or
+	// "..\", which the equality checks above do not catch.
+	//
+	// This must be evaluated on the raw argument and never on the joined
+	// result: pathJoin() below runs path.Clean() against an absolute
+	// drivePath, and Clean() *erases* leading ".." on an absolute path
+	// ("/drive/../../etc" becomes "/etc"), so a check placed after the join
+	// would silently accept an escaped path.
+	//
+	// This is also the only containment control covering callers that never
+	// reach storageRESTServer.getStorage() - notably the peer-S3 bucket RPCs
+	// (MakeBucket/HeadBucket/DeleteBucket/HealBucket), which drive
+	// MakeVol/StatVol/DeleteVol straight off globalLocalDrivesMap.
+	if hasBadPathComponent(volume) {
+		return "", errVolumeNotFound
+	}
 	volumeDir := pathJoin(s.drivePath, volume)
 	return volumeDir, nil
 }
@@ -2407,6 +2423,12 @@ func (s *xlStorage) CheckParts(ctx context.Context, volume string, path string, 
 		return nil, err
 	}
 
+	// Already-persisted metadata can carry this even though the boundary now
+	// refuses it, so the check belongs here too, not only at the wire edge.
+	if fi.HasNegativePartSize() {
+		return nil, errFileCorrupt
+	}
+
 	resp := CheckPartsResp{
 		// By default, all results have an unknown status
 		Results: make([]int, len(fi.Parts)),
@@ -3110,6 +3132,12 @@ func (s *xlStorage) VerifyFile(ctx context.Context, volume, path string, fi File
 		}
 	}
 
+	// See CheckParts: metadata already on disk can carry this even though the
+	// boundary now refuses it.
+	if fi.HasNegativePartSize() {
+		return nil, errFileCorrupt
+	}
+
 	resp := CheckPartsResp{
 		// By default, the result is unknown per part
 		Results: make([]int, len(fi.Parts)),
@@ -3185,81 +3213,6 @@ func (s *xlStorage) ReadParts(ctx context.Context, volume string, partMetaPaths 
 	}
 	diskHealthCheckOK(ctx, nil)
 	return parts, nil
-}
-
-// ReadMultiple will read multiple files and send each back as response.
-// Files are read and returned in the given order.
-// The resp channel is closed before the call returns.
-// Only a canceled context will return an error.
-func (s *xlStorage) ReadMultiple(ctx context.Context, req ReadMultipleReq, resp chan<- ReadMultipleResp) error {
-	defer xioutil.SafeClose(resp)
-
-	volumeDir := pathJoin(s.drivePath, req.Bucket)
-	found := 0
-	for _, f := range req.Files {
-		if contextCanceled(ctx) {
-			return ctx.Err()
-		}
-		r := ReadMultipleResp{
-			Bucket: req.Bucket,
-			Prefix: req.Prefix,
-			File:   f,
-		}
-
-		var data []byte
-		var mt time.Time
-
-		fullPath := pathJoin(volumeDir, req.Prefix, f)
-		w := xioutil.NewDeadlineWorker(globalDriveConfig.GetMaxTimeout())
-		if err := w.Run(func() (err error) {
-			if req.MetadataOnly {
-				data, mt, err = s.readMetadataWithDMTime(ctx, fullPath)
-			} else {
-				data, mt, err = s.readAllDataWithDMTime(ctx, req.Bucket, volumeDir, fullPath)
-			}
-			return err
-		}); err != nil {
-			if !IsErr(err, errFileNotFound, errVolumeNotFound) {
-				r.Exists = true
-				r.Error = err.Error()
-			}
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case resp <- r:
-			}
-			if req.AbortOn404 && !r.Exists {
-				// We stop at first file not found.
-				// We have already reported the error, return nil.
-				return nil
-			}
-			continue
-		}
-		diskHealthCheckOK(ctx, nil)
-		if req.MaxSize > 0 && int64(len(data)) > req.MaxSize {
-			r.Exists = true
-			r.Error = fmt.Sprintf("max size (%d) exceeded: %d", req.MaxSize, len(data))
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case resp <- r:
-				continue
-			}
-		}
-		found++
-		r.Exists = true
-		r.Data = data
-		r.Modtime = mt
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case resp <- r:
-		}
-		if req.MaxResults > 0 && found >= req.MaxResults {
-			return nil
-		}
-	}
-	return nil
 }
 
 func (s *xlStorage) StatInfoFile(ctx context.Context, volume, path string, glob bool) (stat []StatInfo, err error) {

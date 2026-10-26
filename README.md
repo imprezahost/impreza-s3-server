@@ -14,6 +14,30 @@ The project name is provisional.
 - Provides offline build and byte comparison scripts.
 - Preserves upstream source attribution and third-party license notices.
 
+## Console disabled by default
+
+The browser Console is disabled by default as a mitigation for
+[CVE-2026-113466](https://nvd.nist.gov/vuln/detail/CVE-2026-113466).
+S3 API access remains available. An explicit `MINIO_BROWSER=on` enables the
+Console and prints a security warning; it restores exposure to the unresolved
+vulnerability. Existing deployments that explicitly enable the Console must
+remove that setting or set `MINIO_BROWSER=off` to use this mitigation.
+
+This is a default-off mitigation, not a repair of the Console session encryption.
+If you opt in, restrict Console network access and use strong, unique root
+credentials. Previously issued Console sessions are not invalidated by this
+change. Deployment and public release remain separate operator actions.
+
+## Security fixes
+
+This source includes backported fixes for CVE-2026-39414 (S3 Select),
+CVE-2026-41145 (unsigned-trailer uploads), CVE-2026-40344 (Snowball),
+CVE-2026-42600 (internode storage), CVE-2026-97731 (SigV4 unsigned headers),
+CVE-2026-33322 (OIDC), CVE-2026-33419 (LDAP) and CVE-2026-34204 (replication
+metadata). CVE-2026-113466 (Console) is mitigated by the default-off Console,
+not fixed. Some changes are visible to clients and
+identity providers; read [SECURITY.md](SECURITY.md) before upgrading.
+
 ## Quick start: build and compare
 
 Install Go 1.26.10 and prepare

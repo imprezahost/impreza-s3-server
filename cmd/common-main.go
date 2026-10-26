@@ -703,9 +703,12 @@ func loadEnvVarsFromFiles() {
 
 func serverHandleEarlyEnvVars() {
 	var err error
-	globalBrowserEnabled, err = config.ParseBool(env.Get(config.EnvBrowser, config.EnableOn))
+	globalBrowserEnabled, err = config.ParseBool(env.Get(config.EnvBrowser, config.EnableOff))
 	if err != nil {
 		logger.Fatal(config.ErrInvalidBrowserValue(err), "Invalid MINIO_BROWSER value in environment variable")
+	}
+	if globalBrowserEnabled {
+		logger.Info("WARNING: MINIO_BROWSER explicitly enables the Console affected by CVE-2026-113466; the underlying vulnerability remains unresolved. Restrict Console access and use strong, unique root credentials.")
 	}
 }
 

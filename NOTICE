@@ -16,3 +16,9 @@ Licensed under the GNU Affero General Public License, version 3 (AGPLv3).
 The complete upstream LICENSE and existing file copyright notices are preserved.
 Fork maintenance updates dependencies, build tooling and test diagnostics.
 Third-party dependencies retain their respective licenses and copyright notices.
+
+Security backports in this fork include changes from SILO
+(https://github.com/pgsty/silo), Copyright (c) Feng Ruohang and SILO contributors,
+licensed under the GNU Affero General Public License, version 3. SILO commits used:
+d24f449e0891, 3b950f8fa857, 56fa63bfd155, 3252d5b7f349, f444b6f37e44, efb6e5b00b03,
+73ac52472444, 1233254309b1, 2602177e, 80e8eaa4, 1af351a7 and 2f55347f7, with follow-ups.

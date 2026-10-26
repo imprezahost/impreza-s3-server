@@ -85,6 +85,17 @@ func GetSourceScheme(r *http.Request) string {
 	return scheme
 }
 
+// SECURITY NOTE: these headers are trusted from any peer. There is no
+// trusted-proxy boundary, X-Forwarded-For is honoured by default, and X-Real-IP
+// and Forwarded are not gated at all, so any client that can reach the server
+// directly can set the address the rest of the process believes it came from.
+// That includes aws:SourceIp, which means an IpAddress policy condition is not
+// enforceable on a directly reachable deployment - put MinIO behind a proxy
+// that overwrites these headers, or set _MINIO_API_XFF_HEADER=off and keep the
+// other two out at the edge. Adding a trusted-proxy allowlist here would change
+// what every deployment behind a load balancer resolves to, so it is recorded
+// rather than changed.
+//
 // GetSourceIPFromHeaders retrieves the IP from the X-Forwarded-For, X-Real-IP
 // and RFC7239 Forwarded headers (in that order)
 func GetSourceIPFromHeaders(r *http.Request) string {

@@ -24,11 +24,14 @@ import (
 	"io"
 	"net/http"
 	"net/textproto"
+	"net/url"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/minio/minio/internal/config"
+	xhttp "github.com/minio/minio/internal/http"
 )
 
 // Tests validate bucket LocationConstraint.
@@ -152,6 +155,22 @@ func TestExtractMetadataHeaders(t *testing.T) {
 			},
 			shouldFail: false,
 		},
+		// Replication-only headers must not be accepted on ordinary requests.
+		{
+			header: http.Header{
+				"Content-Type": []string{"image/png"},
+				"X-Minio-Replication-Server-Side-Encryption-Sealed-Key":     []string{"sealed-key"},
+				"X-Minio-Replication-Server-Side-Encryption-Seal-Algorithm": []string{"DAREv2-HMAC-SHA256"},
+				"X-Minio-Replication-Server-Side-Encryption-Iv":             []string{"iv"},
+				"X-Minio-Replication-Encrypted-Multipart":                   []string{""},
+				"X-Minio-Replication-Actual-Object-Size":                    []string{"1"},
+				ReplicationSsecChecksumHeader:                               []string{"checksum"},
+			},
+			metadata: map[string]string{
+				"content-type": "image/png",
+			},
+			shouldFail: false,
+		},
 		// Empty header input returns empty metadata.
 		{
 			header:     nil,
@@ -173,6 +192,167 @@ func TestExtractMetadataHeaders(t *testing.T) {
 		if err == nil && !reflect.DeepEqual(metadata, testCase.metadata) {
 			t.Fatalf("Test %d failed: Expected \"%#v\", got \"%#v\"", i+1, testCase.metadata, metadata)
 		}
+	}
+}
+
+func TestExtractMetadataFromRequestUsesHeaderPrecedence(t *testing.T) {
+	query := make(url.Values)
+	query.Set(strings.ToLower(xhttp.AmzStorageClass), "QUERY-CLASS")
+	query.Set(strings.ToLower(xhttp.AmzObjectTagging), "source=query")
+	req, err := http.NewRequest(http.MethodGet, "http://localhost/test?"+query.Encode(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set(xhttp.AmzStorageClass, "HEADER-CLASS")
+	req.Header.Set(xhttp.AmzObjectTagging, "source=header")
+	if err = req.ParseForm(); err != nil {
+		t.Fatal(err)
+	}
+
+	metadata, err := extractMetadataFromReq(t.Context(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := metadata[xhttp.AmzStorageClass]; got != "HEADER-CLASS" {
+		t.Fatalf("storage class: expected header, got %q", got)
+	}
+	if got := metadata[xhttp.AmzObjectTagging]; got != "source=header" {
+		t.Fatalf("tagging: expected header, got %q", got)
+	}
+
+	// Presence, rather than a non-empty value, establishes precedence. This
+	// prevents a query value from taking over when a signed header is empty.
+	req.Header[xhttp.AmzObjectTagging] = []string{""}
+	if got, ok := getRequestHeaderOrQueryValue(req, xhttp.AmzObjectTagging); !ok || got != "" {
+		t.Fatalf("empty header did not override query: value=%q present=%v", got, ok)
+	}
+}
+
+func TestExtractMetadataFromRequestKeepsQueryCompatibility(t *testing.T) {
+	query := make(url.Values)
+	query.Set(strings.ToLower(xhttp.AmzStorageClass), "REDUCED_REDUNDANCY")
+	query.Set(strings.ToLower(xhttp.AmzObjectTagging), "security=public")
+	req, err := http.NewRequest(http.MethodGet, "http://localhost/test?"+query.Encode(), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = req.ParseForm(); err != nil {
+		t.Fatal(err)
+	}
+
+	metadata, err := extractMetadataFromReq(t.Context(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := metadata[xhttp.AmzStorageClass]; got != "REDUCED_REDUNDANCY" {
+		t.Fatalf("storage class query value lost: %q", got)
+	}
+	if got := metadata[xhttp.AmzObjectTagging]; got != "security=public" {
+		t.Fatalf("tagging query value lost: %q", got)
+	}
+}
+
+func TestExtractReplicationMetadataHeaders(t *testing.T) {
+	header := http.Header{
+		"X-Minio-Replication-Server-Side-Encryption-Sealed-Key":     []string{"sealed-key"},
+		"X-Minio-Replication-Server-Side-Encryption-Seal-Algorithm": []string{"DAREv2-HMAC-SHA256"},
+		"X-Minio-Replication-Server-Side-Encryption-Iv":             []string{"iv"},
+		"X-Minio-Replication-Encrypted-Multipart":                   []string{""},
+		"X-Minio-Replication-Actual-Object-Size":                    []string{"1"},
+		ReplicationSsecChecksumHeader:                               []string{"checksum"},
+	}
+
+	metadata := make(map[string]string)
+	if err := extractReplicationMetadataFromMime(t.Context(), textproto.MIMEHeader(header), metadata); err != nil {
+		t.Fatalf("failed to extract replication metadata: %v", err)
+	}
+
+	expected := map[string]string{
+		"X-Minio-Internal-Server-Side-Encryption-Sealed-Key":     "sealed-key",
+		"X-Minio-Internal-Server-Side-Encryption-Seal-Algorithm": "DAREv2-HMAC-SHA256",
+		"X-Minio-Internal-Server-Side-Encryption-Iv":             "iv",
+		"X-Minio-Internal-Encrypted-Multipart":                   "",
+		"X-Minio-Internal-Actual-Object-Size":                    "1",
+		ReplicationSsecChecksumHeader:                            "checksum",
+	}
+
+	if !reflect.DeepEqual(metadata, expected) {
+		t.Fatalf("unexpected replication metadata: expected %#v, got %#v", expected, metadata)
+	}
+}
+
+func TestGetCopyObjectMetadataFromHeaderReplication(t *testing.T) {
+	req, err := http.NewRequest(http.MethodPut, "http://localhost/test", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Form = make(url.Values)
+	req.Header.Set("X-Amz-Metadata-Directive", replaceDirective)
+	req.Header.Set("X-Minio-Replication-Server-Side-Encryption-Sealed-Key", "sealed-key")
+
+	metadata, err := getCpObjMetadataFromHeader(t.Context(), req, nil, false)
+	if err != nil {
+		t.Fatalf("copy metadata extraction failed: %v", err)
+	}
+	if _, ok := metadata["X-Minio-Internal-Server-Side-Encryption-Sealed-Key"]; ok {
+		t.Fatalf("unexpected replication metadata without validation: %#v", metadata)
+	}
+
+	metadata, err = getCpObjMetadataFromHeader(t.Context(), req, nil, true)
+	if err != nil {
+		t.Fatalf("copy metadata extraction with replication failed: %v", err)
+	}
+	if got := metadata["X-Minio-Internal-Server-Side-Encryption-Sealed-Key"]; got != "sealed-key" {
+		t.Fatalf("expected restored replication metadata, got %#v", metadata)
+	}
+}
+
+func TestCloneRequestWithoutReplicationHeaders(t *testing.T) {
+	req, err := http.NewRequest(http.MethodPut, "http://localhost/test", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set(xhttp.MinIOSourceReplicationRequest, "true")
+	req.Header.Set(xhttp.MinIOSourceETag, "etag")
+	req.Header.Set(xhttp.MinIOSourceMTime, "2026-04-15T10:00:00Z")
+	req.Header.Set(xhttp.MinIOSourceTaggingTimestamp, "2026-04-15T10:00:00Z")
+	req.Header.Set(xhttp.MinIOSourceObjectRetentionTimestamp, "2026-04-15T10:00:00Z")
+	req.Header.Set(xhttp.MinIOSourceObjectLegalHoldTimestamp, "2026-04-15T10:00:00Z")
+	req.Header.Set(xhttp.MinIOReplicationActualObjectSize, "123")
+	req.Header.Set(ReplicationSsecChecksumHeader, "checksum")
+	req.Header.Set(xhttp.AmzBucketReplicationStatus, "REPLICA")
+	req.Header.Set(xhttp.MinIOSourceDeleteMarker, "true")
+	req.Header.Set("X-Minio-Replication-Server-Side-Encryption-Sealed-Key", "sealed")
+	req.Header.Set("Content-Type", "application/octet-stream")
+
+	clone := cloneRequestWithoutReplicationHeaders(t.Context(), req)
+	if clone == req {
+		t.Fatal("expected cloned request")
+	}
+
+	for _, header := range []string{
+		xhttp.MinIOSourceReplicationRequest,
+		xhttp.MinIOSourceETag,
+		xhttp.MinIOSourceMTime,
+		xhttp.MinIOSourceTaggingTimestamp,
+		xhttp.MinIOSourceObjectRetentionTimestamp,
+		xhttp.MinIOSourceObjectLegalHoldTimestamp,
+		xhttp.MinIOReplicationActualObjectSize,
+		ReplicationSsecChecksumHeader,
+		xhttp.AmzBucketReplicationStatus,
+		xhttp.MinIOSourceDeleteMarker,
+		"X-Minio-Replication-Server-Side-Encryption-Sealed-Key",
+	} {
+		if got := clone.Header.Get(header); got != "" {
+			t.Fatalf("expected %s to be stripped, got %q", header, got)
+		}
+		if got := req.Header.Get(header); got == "" {
+			t.Fatalf("expected original request to preserve %s", header)
+		}
+	}
+
+	if got := clone.Header.Get("Content-Type"); got != "application/octet-stream" {
+		t.Fatalf("expected non-replication headers to be preserved, got %q", got)
 	}
 }
 
