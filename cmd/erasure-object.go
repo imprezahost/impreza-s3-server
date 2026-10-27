@@ -469,7 +469,7 @@ func auditDanglingObjectDeletion(ctx context.Context, bucket, object, versionID 
 
 func joinErrs(errs []error) string {
 	var s string
-	for i := range s {
+	for i := range errs {
 		if s != "" {
 			s += ","
 		}

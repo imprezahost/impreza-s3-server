@@ -2009,6 +2009,69 @@ func (z *erasureServerPools) CompleteMultipartUpload(ctx context.Context, bucket
 		return z.serverPools[0].CompleteMultipartUpload(ctx, bucket, object, uploadID, uploadedParts, opts)
 	}
 
+	// A conditional completion must be evaluated against the logical latest
+	// object across pools (silo e069fe9d9, adapted: the silo helper lives in
+	// its pool-consistency subsystem, absent here). The pool hosting the
+	// upload may only hold a stale duplicate, so its set-local check would
+	// both accept an outdated ETag and reject the current one. An unreadable
+	// pool is not absence: it may hold the newest copy, so a read that cannot
+	// be verified fails the request instead of passing the condition. Once
+	// satisfied, the callback is cleared so the set layer does not re-evaluate
+	// it against its local copy.
+	if opts.CheckPrecondFn != nil {
+		if !opts.NoLock {
+			lk := z.NewNSLock(bucket, object)
+			lkctx, err := lk.GetLock(ctx, globalOperationTimeout)
+			if err != nil {
+				return objInfo, err
+			}
+			ctx = lkctx.Context()
+			defer lk.Unlock(lkctx)
+			opts.NoLock = true
+		}
+		var latest ObjectInfo
+		found := false
+		lerr := error(nil)
+		for idx, pool := range z.serverPools {
+			if z.IsSuspended(idx) {
+				continue
+			}
+			oi, perr := pool.GetObjectInfo(ctx, bucket, object, ObjectOptions{
+				VersionID:        "",
+				Versioned:        opts.Versioned,
+				VersionSuspended: opts.VersionSuspended,
+				NoLock:           true,
+				NoAuditLog:       true,
+			})
+			if perr == nil || (oi.DeleteMarker && (isErrObjectNotFound(perr) || isErrMethodNotAllowed(perr))) {
+				if !found || oi.ModTime.After(latest.ModTime) {
+					latest, found = oi, true
+				}
+				continue
+			}
+			if !isErrObjectNotFound(perr) && !isErrVersionNotFound(perr) {
+				lerr = perr
+			}
+		}
+		if lerr == nil && (!found || latest.DeleteMarker) {
+			// No readable copy anywhere - a delete-marker latest or a fully
+			// absent key both read as absence, exactly like the set layer.
+			lerr = toObjectErr(errFileNotFound, bucket, object)
+		}
+		if lerr == nil && opts.CheckPrecondFn(latest) {
+			return ObjectInfo{}, PreConditionFailed{}
+		}
+		if lerr != nil && !isErrVersionNotFound(lerr) && !isErrObjectNotFound(lerr) {
+			return ObjectInfo{}, lerr
+		}
+		// An object that cannot be seen: If-Match must not pass on absence;
+		// If-None-Match proceeds.
+		if lerr != nil && opts.HasIfMatch {
+			return ObjectInfo{}, lerr
+		}
+		opts.CheckPrecondFn = nil
+	}
+
 	for idx, pool := range z.serverPools {
 		if z.IsSuspended(idx) {
 			continue

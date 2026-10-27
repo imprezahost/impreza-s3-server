@@ -57,6 +57,18 @@ inclusion. Each one is a separate commit that names the silo commit it came from
 | [CVE-2026-34204](https://github.com/minio/minio/security/advisories/GHSA-3rh2-v3gr-35p9) | Replication metadata headers | Fixed: internal replication headers (source mtime, ETag, delete marker, retention, legal hold and tagging timestamps, SSE-C replication keys) are honoured only after the request is authorized for `s3:ReplicateObject` or `s3:ReplicateDelete`, across GET, HEAD, `GetObjectAttributes`, PUT, copy, Snowball, multipart and DELETE; otherwise they are stripped before options, metadata and event parameters are built (silo SN-2026-008) |
 | [CVE-2026-113466](https://nvd.nist.gov/vuln/detail/CVE-2026-113466) | Console | **Mitigated, not fixed**: see "Console disabled by default" above |
 
+### Other security fixes in this fork
+
+These have no CVE identifier. They are fixed here and listed so operators can check their policies.
+
+| Area | What changed |
+| --- | --- |
+| Object Lock default retention | A PUT, copy or multipart upload that carries `x-amz-object-lock-legal-hold` (`ON` or `OFF`) now inherits the bucket's default retention. Before, any legal-hold header suppressed it, so a caller allowed `s3:PutObjectLegalHold` could store an object outside the bucket's mandatory retention (from silo `9a303f5096c572c74efaca605f50d3c511e9885b`) |
+| `PutObjectRetention` authorization | `s3:PutObjectRetention` is required and is evaluated from the requested retention before any object state is read; `s3:BypassGovernanceRetention` alone no longer sets retention, and is required in addition (with the bypass header) to shorten, remove or change unexpired GOVERNANCE retention. Clearing retention counts as 0 remaining days for `s3:object-lock-remaining-retention-days` (it was the distance to year 0001) (from silo `3196480da93ebe7583677e64848cc5afa4dada18`, SN-2026-015 part) |
+| Writes that name a version | A version whose lock state cannot be read is no longer treated as unlocked: the write fails with the read error. An unexpired GOVERNANCE version now blocks the write like a COMPLIANCE one |
+| Update check | The server no longer contacts `dl.min.io` at startup, and in-place update (`mc admin update`) is removed. Both revealed the server address, version, OS and architecture to a third party |
+| Source address | `X-Forwarded-For`, `X-Real-IP` and `Forwarded` are ignored by default (see below) |
+
 ### Changes you may notice after upgrading
 
 - **OIDC**: identity providers that sign STS tokens with `HS256`, `HS384` or `HS512`
@@ -80,11 +92,24 @@ inclusion. Each one is a separate commit that names the silo commit it came from
   Header-only keys such as `s3:x-amz-content-sha256` ignore query parameters, and
   `ExistingObjectTag` conditions read the stored tags only. Policies that relied
   on a client-supplied value for one of these keys stop matching.
-- **`aws:SourceIp`** is computed from `X-Forwarded-For`, `X-Real-IP` and
-  `Forwarded` when present, and those headers are trusted from any peer. On a
-  directly reachable server, an `IpAddress` condition is not enforceable: put the
-  server behind a proxy that overwrites these headers, or set
-  `_MINIO_API_XFF_HEADER=off` and strip the other two at the edge.
+- **Source address (`aws:SourceIp`, audit and logs)**: `X-Forwarded-For`,
+  `X-Real-IP` and `Forwarded` are **ignored by default**; the address is the
+  connection's. **Incompatible behind a reverse proxy or load balancer**: there
+  every request would come from the proxy's address, so `IpAddress` conditions,
+  audit records and logs would see the proxy. To use the client address
+  again, set `_MINIO_API_XFF_HEADER=on` **only if every request reaches the
+  server through a proxy that overwrites all three headers**; there is no
+  trusted-proxy list, and with it on any client that reaches the server directly
+  chooses its address. Do not turn it on for an onion service: Tor clients
+  arrive over loopback and could set any address. LDAP STS throttling keeps its
+  own `MINIO_IDENTITY_LDAP_STS_TRUSTED_PROXIES` list. SFTP requests are now
+  recorded with the server's own address instead of the SFTP client's.
+- **Updates**: `MINIO_UPDATE` is ignored and `mc admin update` answers
+  `MethodNotAllowed`. Update by replacing the binary.
+- **Object Lock**: a PUT with a legal-hold header now gets the bucket's default
+  retention; `s3:BypassGovernanceRetention` without `s3:PutObjectRetention` no
+  longer sets retention; a write that names a version fails if that version's
+  lock state cannot be read or it is under unexpired GOVERNANCE retention.
 
 This list is not a claim that the fork is free of vulnerabilities. Scan your own
 build as described above.

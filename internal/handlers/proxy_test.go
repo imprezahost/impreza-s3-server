@@ -19,6 +19,7 @@ package handlers
 
 import (
 	"net/http"
+	"os"
 	"testing"
 )
 
@@ -55,8 +56,11 @@ func TestGetScheme(t *testing.T) {
 	}
 }
 
-// TestGetSourceIP - check the source ip of a request is parsed correctly.
+// TestGetSourceIP - check the source ip of a request is parsed correctly when
+// the forwarded headers are trusted (behind a proxy that overwrites them).
 func TestGetSourceIP(t *testing.T) {
+	trustForwardedHeaders = true
+	t.Cleanup(func() { trustForwardedHeaders = false })
 	headers := []headerTest{
 		{xForwardedFor, "8.8.8.8", "8.8.8.8"},                                         // Single address
 		{xForwardedFor, "8.8.8.8, 8.8.4.4", "8.8.8.8"},                                // Multiple
@@ -85,26 +89,35 @@ func TestGetSourceIP(t *testing.T) {
 	}
 }
 
-func TestXFFDisabled(t *testing.T) {
-	req := &http.Request{
-		Header: http.Header{
-			xForwardedFor: []string{"8.8.8.8"},
-			xRealIP:       []string{"1.1.1.1"},
-		},
+// Untrusted by default: none of X-Forwarded-For, X-Real-IP or Forwarded changes the source IP, which stays the
+// connection's address. Trusted (_MINIO_API_XFF_HEADER=on), X-Forwarded-For takes precedence.
+func TestForwardedHeadersIgnoredByDefault(t *testing.T) {
+	if os.Getenv("_MINIO_API_XFF_HEADER") == "" && trustForwardedHeaders {
+		t.Fatal("forwarded headers are trusted without _MINIO_API_XFF_HEADER=on")
 	}
-	// When X-Forwarded-For and X-Real-IP headers are both present, X-Forwarded-For takes precedence.
-	res := GetSourceIP(req)
-	if res != "8.8.8.8" {
-		t.Errorf("wrong header, xff takes precedence: got %s, want: 8.8.8.8", res)
+	trustForwardedHeaders = false
+	t.Cleanup(func() { trustForwardedHeaders = false })
+	for _, h := range []http.Header{
+		{xForwardedFor: []string{"8.8.8.8"}},
+		{xRealIP: []string{"1.1.1.1"}},
+		{forwarded: []string{"for=192.0.2.60;proto=http"}},
+		{xForwardedFor: []string{"8.8.8.8"}, xRealIP: []string{"1.1.1.1"}, forwarded: []string{"for=192.0.2.60"}},
+	} {
+		req := &http.Request{Header: h, RemoteAddr: "127.0.0.1:41000"}
+		if got := GetSourceIPFromHeaders(req); got != "" {
+			t.Errorf("%v: header address used: %s", h, got)
+		}
+		if got := GetSourceIP(req); got != "127.0.0.1" {
+			t.Errorf("%v: got %s, want the connection address 127.0.0.1", h, got)
+		}
 	}
 
-	// When explicitly disabled, the XFF header is ignored and X-Real-IP is used.
-	enableXFFHeader = false
-	defer func() {
-		enableXFFHeader = true
-	}()
-	res = GetSourceIP(req)
-	if res != "1.1.1.1" {
-		t.Errorf("wrong header, xff is disabled: got %s, want: 1.1.1.1", res)
+	trustForwardedHeaders = true
+	req := &http.Request{
+		Header:     http.Header{xForwardedFor: []string{"8.8.8.8"}, xRealIP: []string{"1.1.1.1"}},
+		RemoteAddr: "127.0.0.1:41000",
+	}
+	if got := GetSourceIP(req); got != "8.8.8.8" {
+		t.Errorf("trusted: X-Forwarded-For takes precedence: got %s, want 8.8.8.8", got)
 	}
 }

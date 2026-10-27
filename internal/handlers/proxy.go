@@ -54,8 +54,11 @@ var (
 	protoRegex = regexp.MustCompile(`(?i)^(;|,| )+(?:proto=)(https|http)`)
 )
 
-// Used to disable all processing of the X-Forwarded-For header in source IP discovery.
-var enableXFFHeader = env.Get("_MINIO_API_XFF_HEADER", config.EnableOn) == config.EnableOn
+// trustForwardedHeaders gates X-Forwarded-For, X-Real-IP and Forwarded in source IP discovery. Off by default:
+// any client that reaches the server directly - including every client of an onion service, which arrives over
+// loopback - could otherwise choose the address used for aws:SourceIp and the audit log. Set
+// _MINIO_API_XFF_HEADER=on only behind a reverse proxy that overwrites all three headers.
+var trustForwardedHeaders = env.Get("_MINIO_API_XFF_HEADER", config.EnableOff) == config.EnableOn
 
 // GetSourceScheme retrieves the scheme from the X-Forwarded-Proto and RFC7239
 // Forwarded headers (in that order).
@@ -85,33 +88,30 @@ func GetSourceScheme(r *http.Request) string {
 	return scheme
 }
 
-// SECURITY NOTE: these headers are trusted from any peer. There is no
-// trusted-proxy boundary, X-Forwarded-For is honoured by default, and X-Real-IP
-// and Forwarded are not gated at all, so any client that can reach the server
-// directly can set the address the rest of the process believes it came from.
-// That includes aws:SourceIp, which means an IpAddress policy condition is not
-// enforceable on a directly reachable deployment - put MinIO behind a proxy
-// that overwrites these headers, or set _MINIO_API_XFF_HEADER=off and keep the
-// other two out at the edge. Adding a trusted-proxy allowlist here would change
-// what every deployment behind a load balancer resolves to, so it is recorded
-// rather than changed.
+// SECURITY NOTE: when trustForwardedHeaders is on, these headers are trusted from any peer: there is no
+// trusted-proxy boundary. Turn it on only when every request reaches the server through a proxy that overwrites
+// X-Forwarded-For, X-Real-IP and Forwarded; otherwise a client can set the address the rest of the process
+// believes it came from, including aws:SourceIp.
 //
 // GetSourceIPFromHeaders retrieves the IP from the X-Forwarded-For, X-Real-IP
-// and RFC7239 Forwarded headers (in that order)
+// and RFC7239 Forwarded headers (in that order), only when trustForwardedHeaders
+// is on. Otherwise it returns "" and callers use the connection's address.
 func GetSourceIPFromHeaders(r *http.Request) string {
 	var addr string
 
-	if enableXFFHeader {
-		if fwd := r.Header.Get(xForwardedFor); fwd != "" {
-			// Only grab the first (client) address. Note that '192.168.0.1,
-			// 10.1.1.1' is a valid key for X-Forwarded-For where addresses after
-			// the first may represent forwarding proxies earlier in the chain.
-			s := strings.Index(fwd, ", ")
-			if s == -1 {
-				s = len(fwd)
-			}
-			addr = fwd[:s]
+	if !trustForwardedHeaders {
+		return addr
+	}
+
+	if fwd := r.Header.Get(xForwardedFor); fwd != "" {
+		// Only grab the first (client) address. Note that '192.168.0.1,
+		// 10.1.1.1' is a valid key for X-Forwarded-For where addresses after
+		// the first may represent forwarding proxies earlier in the chain.
+		s := strings.Index(fwd, ", ")
+		if s == -1 {
+			s = len(fwd)
 		}
+		addr = fwd[:s]
 	}
 
 	if addr == "" {

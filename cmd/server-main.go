@@ -851,15 +851,9 @@ func serverMain(ctx *cli.Context) {
 		getCert = globalTLSCerts.GetCertificate
 	}
 
-	// Check for updates in non-blocking manner.
-	go func() {
-		if !globalServerCtxt.Quiet && !globalInplaceUpdateDisabled {
-			// Check for new updates from dl.min.io.
-			bootstrapTrace("checkUpdate", func() {
-				checkUpdate(getMinioMode())
-			})
-		}
-	}()
+	// No update check: a privacy-focused deployment must not contact a third
+	// party at startup (it reveals the server address, version, OS and
+	// architecture). Updates are a deliberate operator action.
 
 	// Set system resources to maximum.
 	bootstrapTrace("setMaxResources", func() {

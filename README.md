@@ -35,7 +35,10 @@ CVE-2026-41145 (unsigned-trailer uploads), CVE-2026-40344 (Snowball),
 CVE-2026-42600 (internode storage), CVE-2026-97731 (SigV4 unsigned headers),
 CVE-2026-33322 (OIDC), CVE-2026-33419 (LDAP) and CVE-2026-34204 (replication
 metadata). CVE-2026-113466 (Console) is mitigated by the default-off Console,
-not fixed. Some changes are visible to clients and
+not fixed. It also fixes Object Lock default retention and retention
+authorization, never checks for updates, and ignores `X-Forwarded-For`,
+`X-Real-IP` and `Forwarded` by default (behind a proxy that overwrites them, set
+`_MINIO_API_XFF_HEADER=on`). Some changes are visible to clients and
 identity providers; read [SECURITY.md](SECURITY.md) before upgrading.
 
 ## Quick start: build and compare
