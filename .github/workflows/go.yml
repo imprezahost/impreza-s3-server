@@ -1,14 +1,15 @@
 name: Functional Tests
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - master
+    branches: [main]
 
 # This ensures that previous jobs for the PR are canceled when the PR is
 # updated.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,27 +17,30 @@ permissions:
 
 jobs:
   build:
-    name: Go ${{ matrix.go-version }} on ${{ matrix.os }} - healing
+    name: Go from go.mod on ${{ matrix.os }} - healing
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.24.x]
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          check-latest: true
+          go-version-file: go.mod
       - name: Build on ${{ matrix.os }}
         if: matrix.os == 'ubuntu-latest'
         env:
-          CGO_ENABLED: 0
-          GO111MODULE: on
+          CGO_ENABLED: "0"
+          GO111MODULE: "on"
           MINIO_KMS_SECRET_KEY: "my-minio-key:OSMM+vkKUTCvQs9YL/CVMIMt43HFhkUpqJxTmGl6rYw="
-          MINIO_KMS_AUTO_ENCRYPTION: on
+          MINIO_KMS_AUTO_ENCRYPTION: "on"
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
-          make verify
-          make test-timeout
+          MINIO_API_REQUESTS_MAX=10000 go test -v -tags kqueue,dev ./...
+          # DISABLED: upstream mc functional matrix unavailable (see CI README).
+          # make verify
+          # DISABLED: timeout integration needs an admitted fork-owned client fixture.
+          # make test-timeout

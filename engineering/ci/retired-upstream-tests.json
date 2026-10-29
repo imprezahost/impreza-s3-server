@@ -1,0 +1,206 @@
+[
+  {
+    "path": "buildscripts/disable-root.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "disable root"
+  },
+  {
+    "path": "buildscripts/heal-inconsistent-versions.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "heal inconsistent versions"
+  },
+  {
+    "path": "buildscripts/minio-upgrade.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "minio upgrade"
+  },
+  {
+    "path": "buildscripts/multipart-quorum-test.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "multipart quorum test"
+  },
+  {
+    "path": "buildscripts/resolve-right-versions.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "resolve right versions"
+  },
+  {
+    "path": "buildscripts/rewrite-old-new.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "rewrite old new"
+  },
+  {
+    "path": "buildscripts/test-timeout.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "test timeout"
+  },
+  {
+    "path": "buildscripts/verify-build.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "verify build"
+  },
+  {
+    "path": "buildscripts/verify-healing-empty-erasure-set.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "verify healing empty erasure set"
+  },
+  {
+    "path": "buildscripts/verify-healing.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "verify healing"
+  },
+  {
+    "path": "docs/bucket/lifecycle/setup_ilm_transition.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "setup ilm transition"
+  },
+  {
+    "path": "docs/bucket/replication/delete-replication.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "delete replication"
+  },
+  {
+    "path": "docs/bucket/replication/setup_2site_existing_replication.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "setup 2site existing replication"
+  },
+  {
+    "path": "docs/bucket/replication/setup_3site_replication.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "setup 3site replication"
+  },
+  {
+    "path": "docs/bucket/replication/setup_ilm_expiry_replication.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "setup ilm expiry replication"
+  },
+  {
+    "path": "docs/bucket/replication/test_del_marker_proxying.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "test del marker proxying"
+  },
+  {
+    "path": "docs/bucket/versioning/versioning-tests.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "versioning tests"
+  },
+  {
+    "path": "docs/distributed/decom-compressed-sse-s3.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "decom compressed sse s3"
+  },
+  {
+    "path": "docs/distributed/decom-encrypted-kes.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "decom encrypted kes"
+  },
+  {
+    "path": "docs/distributed/decom-encrypted-sse-s3.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "decom encrypted sse s3"
+  },
+  {
+    "path": "docs/distributed/decom-encrypted.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "decom encrypted"
+  },
+  {
+    "path": "docs/distributed/decom.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "decom"
+  },
+  {
+    "path": "docs/distributed/distributed-from-config-file.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "distributed from config file"
+  },
+  {
+    "path": "docs/distributed/iam-import-with-missing-entities.sh",
+    "status": "removed",
+    "ci": "not called by maintained workflows",
+    "coverage_lost": "iam import with missing entities"
+  },
+  {
+    "path": "docs/distributed/iam-import-with-openid.sh",
+    "status": "removed",
+    "ci": "not called by maintained workflows",
+    "coverage_lost": "iam import with openid"
+  },
+  {
+    "path": "docs/iam/policies/pbac-tests.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "pbac tests"
+  },
+  {
+    "path": "docs/site-replication/ldap.yaml",
+    "status": "removed",
+    "ci": "not called by maintained workflows",
+    "coverage_lost": "ldap"
+  },
+  {
+    "path": "docs/site-replication/run-multi-site-ldap.sh",
+    "status": "removed",
+    "ci": "not called by maintained workflows",
+    "coverage_lost": "run multi site ldap"
+  },
+  {
+    "path": "docs/site-replication/run-multi-site-minio-idp.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "run multi site minio idp"
+  },
+  {
+    "path": "docs/site-replication/run-multi-site-oidc.sh",
+    "status": "removed",
+    "ci": "not called by maintained workflows",
+    "coverage_lost": "run multi site oidc"
+  },
+  {
+    "path": "docs/site-replication/run-replication-with-checksum-header.sh",
+    "status": "removed",
+    "ci": "not called by maintained workflows",
+    "coverage_lost": "run replication with checksum header"
+  },
+  {
+    "path": "docs/site-replication/run-sse-kms-object-replication.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "run sse kms object replication"
+  },
+  {
+    "path": "docs/site-replication/run-ssec-object-replication-with-compression.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "run ssec object replication with compression"
+  },
+  {
+    "path": "docs/site-replication/run-ssec-object-replication.sh",
+    "status": "disabled",
+    "ci": "retained entrypoint; maintained workflow invocation disabled",
+    "coverage_lost": "run ssec object replication"
+  }
+]

@@ -1,6 +1,13 @@
 ---
 name: Spelling
-on: [pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   run:
@@ -9,7 +16,9 @@ jobs:
     steps:
     - name: Checkout Actions Repository
       uses: actions/checkout@v4
+      with:
+        persist-credentials: false
 
     - name: Check spelling of repo
-      uses: crate-ci/typos@master
+      uses: crate-ci/typos@7f9d0819ca1c008ade73f4b41fa9d258d48f605b # v1.51.1 (commit; the tag object is 9023c1f7)
 

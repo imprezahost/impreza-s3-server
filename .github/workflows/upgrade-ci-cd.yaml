@@ -1,14 +1,15 @@
 name: Upgrade old version tests
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - master
+    branches: [main]
 
 # This ensures that previous jobs for the PR are canceled when the PR is
 # updated.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,19 +17,21 @@ permissions:
 
 jobs:
   build:
-    name: Go ${{ matrix.go-version }} on ${{ matrix.os }}
+    # DISABLED: historical-format upgrade upstream fixture coverage unavailable; see engineering/ci/README.md.
+    if: ${{ false }}
+    name: Go from go.mod on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.24.x]
         os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          check-latest: true
+          go-version-file: go.mod
       - name: Start upgrade tests
         run: |
           make test-upgrade

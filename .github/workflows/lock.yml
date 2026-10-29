@@ -1,24 +1,18 @@
-name: 'Lock Threads'
+name: Lock Threads
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
-  issues: write
-
-concurrency:
-  group: lock
+  contents: read
 
 jobs:
-  action:
+  disabled:
+    # DISABLED: Automatic locking of old issues is disabled for this fork. Issues remain open for human triage; no issue-write permission or scheduled issue mutation is granted.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - uses: dessant/lock-threads@v3
-        with:
-          github-token: ${{ github.token }}
-          issue-inactive-days: '365'
-          exclude-any-issue-labels: 'do-not-close'
-          issue-lock-reason: 'resolved'
-          log-output: true
+      - run: echo "Disabled; see the coverage explanation above."

@@ -25,7 +25,6 @@ import (
 	"sync"
 	"time"
 
-	consoleapi "github.com/minio/console/api"
 	"github.com/minio/dnscache"
 	"github.com/minio/madmin-go/v3"
 	"github.com/minio/minio-go/v7"
@@ -398,8 +397,6 @@ var (
 	globalForwarder *handlers.Forwarder
 
 	globalTierConfigMgr *TierConfigMgr
-
-	globalConsoleSrv *consoleapi.Server
 
 	// handles service freeze or un-freeze S3 API calls.
 	globalServiceFreeze atomic.Value

@@ -42,7 +42,7 @@ This section describes how to generate a self-signed certificate using various t
 
 ### 3.1 Use `certgen` to Generate a Certificate
 
-Download [`certgen`](https://github.com/minio/certgen/releases/latest) for your specific operating system and platform.
+Use an already admitted, locally installed certificate generator for your operating system and platform. This fork does not acquire an upstream certgen binary.
 
 `certgen` is a simple *Go* tool to generate self-signed certificates, and provides SAN certificates with DNS and IP entries:
 

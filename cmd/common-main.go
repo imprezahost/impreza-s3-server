@@ -28,25 +28,18 @@ import (
 	"net"
 	"net/url"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"sort"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/dustin/go-humanize"
 	fcolor "github.com/fatih/color"
-	"github.com/go-openapi/loads"
 	"github.com/inconshreveable/mousetrap"
 	dns2 "github.com/miekg/dns"
 	"github.com/minio/cli"
-	consoleapi "github.com/minio/console/api"
-	"github.com/minio/console/api/operations"
-	consoleoauth2 "github.com/minio/console/pkg/auth/idp/oauth2"
-	consoleCerts "github.com/minio/console/pkg/certs"
 	"github.com/minio/kms-go/kes"
 	"github.com/minio/madmin-go/v3"
 	"github.com/minio/minio-go/v7"
@@ -113,185 +106,6 @@ func init() {
 	madmin.MaxRetry = 1
 
 	currentReleaseTime, _ = GetCurrentReleaseTime()
-}
-
-const consolePrefix = "CONSOLE_"
-
-func minioConfigToConsoleFeatures() {
-	os.Setenv("CONSOLE_PBKDF_SALT", globalDeploymentID())
-	os.Setenv("CONSOLE_PBKDF_PASSPHRASE", globalDeploymentID())
-	if globalMinioEndpoint != "" {
-		os.Setenv("CONSOLE_MINIO_SERVER", globalMinioEndpoint)
-	} else {
-		// Explicitly set 127.0.0.1 so Console will automatically bypass TLS verification to the local S3 API.
-		// This will save users from providing a certificate with IP or FQDN SAN that points to the local host.
-		os.Setenv("CONSOLE_MINIO_SERVER", fmt.Sprintf("%s://127.0.0.1:%s", getURLScheme(globalIsTLS), globalMinioPort))
-	}
-	if value := env.Get(config.EnvMinIOLogQueryURL, ""); value != "" {
-		os.Setenv("CONSOLE_LOG_QUERY_URL", value)
-		if value := env.Get(config.EnvMinIOLogQueryAuthToken, ""); value != "" {
-			os.Setenv("CONSOLE_LOG_QUERY_AUTH_TOKEN", value)
-		}
-	}
-	if value := env.Get(config.EnvBrowserRedirectURL, ""); value != "" {
-		os.Setenv("CONSOLE_BROWSER_REDIRECT_URL", value)
-	}
-	if value := env.Get(config.EnvConsoleDebugLogLevel, ""); value != "" {
-		os.Setenv("CONSOLE_DEBUG_LOGLEVEL", value)
-	}
-	// pass the console subpath configuration
-	if globalBrowserRedirectURL != nil {
-		subPath := path.Clean(pathJoin(strings.TrimSpace(globalBrowserRedirectURL.Path), SlashSeparator))
-		if subPath != SlashSeparator {
-			os.Setenv("CONSOLE_SUBPATH", subPath)
-		}
-	}
-	// Enable if prometheus URL is set.
-	if value := env.Get(config.EnvMinIOPrometheusURL, ""); value != "" {
-		os.Setenv("CONSOLE_PROMETHEUS_URL", value)
-		if value := env.Get(config.EnvMinIOPrometheusJobID, "minio-job"); value != "" {
-			os.Setenv("CONSOLE_PROMETHEUS_JOB_ID", value)
-			// Support additional labels for more granular filtering.
-			if value := env.Get(config.EnvMinIOPrometheusExtraLabels, ""); value != "" {
-				os.Setenv("CONSOLE_PROMETHEUS_EXTRA_LABELS", value)
-			}
-		}
-		// Support Prometheus Auth Token
-		if value := env.Get(config.EnvMinIOPrometheusAuthToken, ""); value != "" {
-			os.Setenv("CONSOLE_PROMETHEUS_AUTH_TOKEN", value)
-		}
-	}
-	// Enable if LDAP is enabled.
-	if globalIAMSys.LDAPConfig.Enabled() {
-		os.Setenv("CONSOLE_LDAP_ENABLED", config.EnableOn)
-	}
-	// Handle animation in welcome page
-	if value := env.Get(config.EnvBrowserLoginAnimation, "on"); value != "" {
-		os.Setenv("CONSOLE_ANIMATED_LOGIN", value)
-	}
-
-	// Pass on the session duration environment variable, else we will default to 12 hours
-	if valueSts := env.Get(config.EnvMinioStsDuration, ""); valueSts != "" {
-		os.Setenv("CONSOLE_STS_DURATION", valueSts)
-	} else if valueSession := env.Get(config.EnvBrowserSessionDuration, ""); valueSession != "" {
-		os.Setenv("CONSOLE_STS_DURATION", valueSession)
-	}
-
-	os.Setenv("CONSOLE_MINIO_SITE_NAME", globalSite.Name())
-	os.Setenv("CONSOLE_MINIO_SITE_REGION", globalSite.Region())
-	os.Setenv("CONSOLE_MINIO_REGION", globalSite.Region())
-
-	os.Setenv("CONSOLE_CERT_PASSWD", env.Get("MINIO_CERT_PASSWD", ""))
-
-	// This section sets Browser (console) stored config
-	if valueSCP := globalBrowserConfig.GetCSPolicy(); valueSCP != "" {
-		os.Setenv("CONSOLE_SECURE_CONTENT_SECURITY_POLICY", valueSCP)
-	}
-
-	if hstsSeconds := globalBrowserConfig.GetHSTSSeconds(); hstsSeconds > 0 {
-		isubdom := globalBrowserConfig.IsHSTSIncludeSubdomains()
-		isprel := globalBrowserConfig.IsHSTSPreload()
-		os.Setenv("CONSOLE_SECURE_STS_SECONDS", strconv.Itoa(hstsSeconds))
-		os.Setenv("CONSOLE_SECURE_STS_INCLUDE_SUB_DOMAINS", isubdom)
-		os.Setenv("CONSOLE_SECURE_STS_PRELOAD", isprel)
-	}
-
-	if valueRefer := globalBrowserConfig.GetReferPolicy(); valueRefer != "" {
-		os.Setenv("CONSOLE_SECURE_REFERRER_POLICY", valueRefer)
-	}
-
-	globalSubnetConfig.ApplyEnv()
-}
-
-func buildOpenIDConsoleConfig() consoleoauth2.OpenIDPCfg {
-	pcfgs := globalIAMSys.OpenIDConfig.ProviderCfgs
-	m := make(map[string]consoleoauth2.ProviderConfig, len(pcfgs))
-	for name, cfg := range pcfgs {
-		callback := getConsoleEndpoints()[0] + "/oauth_callback"
-		if cfg.RedirectURI != "" {
-			callback = cfg.RedirectURI
-		}
-		m[name] = consoleoauth2.ProviderConfig{
-			URL:                     cfg.URL.String(),
-			DisplayName:             cfg.DisplayName,
-			ClientID:                cfg.ClientID,
-			ClientSecret:            cfg.ClientSecret,
-			HMACSalt:                globalDeploymentID(),
-			HMACPassphrase:          cfg.ClientID,
-			Scopes:                  strings.Join(cfg.DiscoveryDoc.ScopesSupported, ","),
-			Userinfo:                cfg.ClaimUserinfo,
-			RedirectCallbackDynamic: cfg.RedirectURIDynamic,
-			RedirectCallback:        callback,
-			EndSessionEndpoint:      cfg.DiscoveryDoc.EndSessionEndpoint,
-			RoleArn:                 cfg.GetRoleArn(),
-		}
-	}
-	return m
-}
-
-func initConsoleServer() (*consoleapi.Server, error) {
-	// unset all console_ environment variables.
-	for _, cenv := range env.List(consolePrefix) {
-		os.Unsetenv(cenv)
-	}
-
-	// enable all console environment variables
-	minioConfigToConsoleFeatures()
-
-	// set certs dir to minio directory
-	consoleCerts.GlobalCertsDir = &consoleCerts.ConfigDir{
-		Path: globalCertsDir.Get(),
-	}
-	consoleCerts.GlobalCertsCADir = &consoleCerts.ConfigDir{
-		Path: globalCertsCADir.Get(),
-	}
-
-	// set certs before other console initialization
-	consoleapi.GlobalRootCAs, consoleapi.GlobalPublicCerts, consoleapi.GlobalTLSCertsManager = globalRootCAs, globalPublicCerts, globalTLSCerts
-
-	swaggerSpec, err := loads.Embedded(consoleapi.SwaggerJSON, consoleapi.FlatSwaggerJSON)
-	if err != nil {
-		return nil, err
-	}
-
-	api := operations.NewConsoleAPI(swaggerSpec)
-
-	if !serverDebugLog {
-		// Disable console logging if server debug log is not enabled
-		noLog := func(string, ...any) {}
-
-		consoleapi.LogInfo = noLog
-		consoleapi.LogError = noLog
-		api.Logger = noLog
-	}
-
-	// Pass in console application config. This needs to happen before the
-	// ConfigureAPI() call.
-	consoleapi.GlobalMinIOConfig = consoleapi.MinIOConfig{
-		OpenIDProviders: buildOpenIDConsoleConfig(),
-	}
-
-	server := consoleapi.NewServer(api)
-	// register all APIs
-	server.ConfigureAPI()
-
-	consolePort, _ := strconv.Atoi(globalMinioConsolePort)
-
-	server.Host = globalMinioConsoleHost
-	server.Port = consolePort
-	consoleapi.Port = globalMinioConsolePort
-	consoleapi.Hostname = globalMinioConsoleHost
-
-	if globalIsTLS {
-		// If TLS certificates are provided enforce the HTTPS.
-		server.EnabledListeners = []string{"https"}
-		server.TLSPort = consolePort
-		// Need to store tls-port, tls-host un config variables so secure.middleware can read from there
-		consoleapi.TLSPort = globalMinioConsolePort
-		consoleapi.Hostname = globalMinioConsoleHost
-	}
-
-	return server, nil
 }
 
 func newConfigDir(dir string, dirSet bool, getDefaultDir func() string) (*ConfigDir, error) {
@@ -672,8 +486,10 @@ func serverHandleEarlyEnvVars() {
 		logger.Fatal(config.ErrInvalidBrowserValue(err), "Invalid MINIO_BROWSER value in environment variable")
 	}
 	if globalBrowserEnabled {
-		logger.Info("WARNING: MINIO_BROWSER explicitly enables the Console affected by CVE-2026-113466; the underlying vulnerability remains unresolved. Restrict Console access and use strong, unique root credentials.")
+		logger.Info("WARNING: MINIO_BROWSER=on ignored: the legacy browser Console has been removed")
+		globalBrowserEnabled = false
 	}
+
 }
 
 func serverHandleEnvVars() {

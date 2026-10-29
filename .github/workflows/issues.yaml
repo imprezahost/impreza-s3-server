@@ -1,18 +1,18 @@
-# @format
-
 name: Issue Workflow
 
 on:
-  issues:
-    types:
-      - opened
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  add-to-project:
-    name: Add issue to project
+  disabled:
+    # DISABLED: The MinIO project and BOT_PAT are not resources of this fork. Automatic issue-to-project assignment is disabled; issue intake itself is unchanged.
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@v0.5.0
-        with:
-          project-url: https://github.com/orgs/miniohq/projects/2
-          github-token: ${{ secrets.BOT_PAT }}
+      - run: echo "Disabled; see the coverage explanation above."

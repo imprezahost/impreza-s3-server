@@ -1,14 +1,15 @@
 name: Linters and Tests
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - master
+    branches: [main]
 
 # This ensures that previous jobs for the PR are canceled when the PR is
 # updated.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,27 +17,33 @@ permissions:
 
 jobs:
   build:
-    name: Go ${{ matrix.go-version }} on ${{ matrix.os }}
+    name: Go from go.mod on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.24.x]
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          check-latest: true
+          go-version-file: go.mod
+      - name: Lint
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.9.0
+          args: --build-tags kqueue --timeout 10m --config .golangci.yml
       - name: Build on ${{ matrix.os }}
         if: matrix.os == 'ubuntu-latest'
         env:
-          CGO_ENABLED: 0
-          GO111MODULE: on
+          CGO_ENABLED: "0"
+          GO111MODULE: "on"
         run: |
           sudo apt install jq -y
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
           make
-          make test
-          make test-race
+          make check-gen
+          MINIO_API_REQUESTS_MAX=10000 CGO_ENABLED=0 go test -v -tags kqueue,dev ./...
+          bash buildscripts/race.sh

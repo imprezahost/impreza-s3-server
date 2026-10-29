@@ -1,14 +1,22 @@
 name: 'Dependency Review'
-on: [pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
   dependency-review:
+    # The action compares PR base/head; push coverage belongs to daily govulncheck.
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@v4

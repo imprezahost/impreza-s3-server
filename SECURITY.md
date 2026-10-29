@@ -25,19 +25,22 @@ tracked dependency lock. Check both source and executable with a current,
 independently obtained vulnerability database, recording its timestamp.
 Retain all findings and assess reachability; no clean-scanner claim is made here.
 
-## Console disabled by default
+## Legacy Console removed
 
-The browser Console is disabled by default as a mitigation for
-[CVE-2026-113466](https://nvd.nist.gov/vuln/detail/CVE-2026-113466).
-S3 API access remains available. An explicit `MINIO_BROWSER=on` enables the
-Console and prints a security warning; it restores exposure to the unresolved
-vulnerability. Existing deployments that explicitly enable the Console must
-remove that setting or set `MINIO_BROWSER=off` to use this mitigation.
+The legacy browser Console and its source integration are removed. The standard
+release contains no Console code, and there is no legacy opt-in variant.
+`MINIO_BROWSER=on` logs a warning and leaves the browser disabled; S3 API access
+remains available. Publication and rollout of this source change are separate
+maintainer actions.
 
-This is a default-off mitigation, not a repair of the Console session encryption.
-If you opt in, restrict Console network access and use strong, unique root
-credentials. Previously issued Console sessions are not invalidated by this
-change. Deployment and public release remain separate operator actions.
+[CVE-2026-113466](https://www.cve.org/CVERecord?id=CVE-2026-113466) exists: its
+[published CNA record](https://github.com/CVEProject/cvelistV5/blob/main/cves/2026/113xxx/CVE-2026-113466.json)
+identifies the embedded Console's session authentication/key derivation.
+Removing the component is not a cryptographic repair of the old implementation.
+It does not invalidate sessions or alter an already-running old binary.
+
+See [maintenance and dependency policy](docs/MAINTENANCE.md) for triage and release
+gates. Do not publish a variant as fixed based only on a module version or scan.
 
 ## Server vulnerabilities fixed in this fork
 
@@ -55,7 +58,7 @@ inclusion. Each one is a separate commit that names the silo commit it came from
 | [CVE-2026-33322](https://github.com/minio/minio/security/advisories/GHSA-5cx5-wh4m-82fh) | OIDC STS | Fixed: HMAC-signed tokens are no longer accepted |
 | [CVE-2026-33419](https://github.com/minio/minio/security/advisories/GHSA-jv87-32hw-hh99) | LDAP STS | Fixed: unknown users and wrong passwords get the same answer; logins are throttled per source address |
 | [CVE-2026-34204](https://github.com/minio/minio/security/advisories/GHSA-3rh2-v3gr-35p9) | Replication metadata headers | Fixed: internal replication headers (source mtime, ETag, delete marker, retention, legal hold and tagging timestamps, SSE-C replication keys) are honoured only after the request is authorized for `s3:ReplicateObject` or `s3:ReplicateDelete`, across GET, HEAD, `GetObjectAttributes`, PUT, copy, Snowball, multipart and DELETE; otherwise they are stripped before options, metadata and event parameters are built (silo SN-2026-008) |
-| [CVE-2026-113466](https://nvd.nist.gov/vuln/detail/CVE-2026-113466) | Console | **Mitigated, not fixed**: see "Console disabled by default" above |
+| [CVE-2026-113466](https://nvd.nist.gov/vuln/detail/CVE-2026-113466) | Console | **Legacy component removed** from this source; no opt-in variant (see above) |
 
 ### Other security fixes in this fork
 
@@ -70,6 +73,13 @@ These have no CVE identifier. They are fixed here and listed so operators can ch
 | Source address | `X-Forwarded-For`, `X-Real-IP` and `Forwarded` are ignored by default (see below) |
 
 ### Changes you may notice after upgrading
+
+- **No official container image or Helm chart**: this fork builds and
+  distributes signed **binaries only**; the upstream `Dockerfile`s, image
+  publication and the Helm chart were removed. Run it from the binary in the
+  signed release, or containerize it yourself with your own image review.
+- **Browser Console**: the legacy implementation is removed, including its
+  opt-in variant. `MINIO_BROWSER=on` cannot enable it.
 
 - **OIDC**: identity providers that sign STS tokens with `HS256`, `HS384` or `HS512`
   must move to JWKS-backed RSA or ECDSA keys.

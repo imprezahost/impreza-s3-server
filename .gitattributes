@@ -1,0 +1,4 @@
+# Dependency lock inputs must have the same bytes on all checkout platforms.
+/go.mod text eol=lf
+/go.sum text eol=lf
+/engineering/build/dependency-lock.sha256 text eol=lf

@@ -1,14 +1,15 @@
 name: Healing Functional Tests
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - master
+    branches: [main]
 
 # This ensures that previous jobs for the PR are canceled when the PR is
 # updated.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,29 +17,33 @@ permissions:
 
 jobs:
   build:
-    name: Go ${{ matrix.go-version }} on ${{ matrix.os }}
+    # DISABLED: healing, inconsistent versions, root disks and old-format rewrite coverage needs fork-owned client fixtures; see engineering/ci/README.md.
+    if: ${{ false }}
+    name: Go from go.mod on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go-version: [1.24.x]
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          check-latest: true
+          go-version-file: go.mod
       - name: Build on ${{ matrix.os }}
         if: matrix.os == 'ubuntu-latest'
         env:
-          CGO_ENABLED: 0
-          GO111MODULE: on
+          CGO_ENABLED: "0"
+          GO111MODULE: "on"
           MINIO_KMS_SECRET_KEY: "my-minio-key:oyArl7zlPECEduNbB1KXgdzDn2Bdpvvw0l8VO51HQnY="
-          MINIO_KMS_AUTO_ENCRYPTION: on
+          MINIO_KMS_AUTO_ENCRYPTION: "on"
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
-          make verify-healing
+          # DISABLED: verify-healing upstream fixture coverage unavailable.
+          # make verify-healing
           make verify-healing-inconsistent-versions
           make verify-healing-with-root-disks
-          make verify-healing-with-rewrite
+          # DISABLED: verify-healing-with-rewrite upstream fixture coverage unavailable.
+          # make verify-healing-with-rewrite

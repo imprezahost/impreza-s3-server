@@ -14,19 +14,14 @@ The project name is provisional.
 - Provides offline build and byte comparison scripts.
 - Preserves upstream source attribution and third-party license notices.
 
-## Console disabled by default
+## Browser Console removed
 
-The browser Console is disabled by default as a mitigation for
-[CVE-2026-113466](https://nvd.nist.gov/vuln/detail/CVE-2026-113466).
-S3 API access remains available. An explicit `MINIO_BROWSER=on` enables the
-Console and prints a security warning; it restores exposure to the unresolved
-vulnerability. Existing deployments that explicitly enable the Console must
-remove that setting or set `MINIO_BROWSER=off` to use this mitigation.
-
-This is a default-off mitigation, not a repair of the Console session encryption.
-If you opt in, restrict Console network access and use strong, unique root
-credentials. Previously issued Console sessions are not invalidated by this
-change. Deployment and public release remain separate operator actions.
+The legacy browser Console is removed from the source and release build.
+`MINIO_BROWSER=on` logs a warning and leaves the browser disabled; there is no
+legacy opt-in build. S3 API access remains available. See
+[SECURITY.md](SECURITY.md) and [maintenance](docs/MAINTENANCE.md).
+This does not invalidate Console sessions in an old running binary. Publication
+and rollout are separate maintainer actions.
 
 ## Security fixes
 
@@ -34,8 +29,8 @@ This source includes backported fixes for CVE-2026-39414 (S3 Select),
 CVE-2026-41145 (unsigned-trailer uploads), CVE-2026-40344 (Snowball),
 CVE-2026-42600 (internode storage), CVE-2026-97731 (SigV4 unsigned headers),
 CVE-2026-33322 (OIDC), CVE-2026-33419 (LDAP) and CVE-2026-34204 (replication
-metadata). CVE-2026-113466 (Console) is mitigated by the default-off Console,
-not fixed. It also fixes Object Lock default retention and retention
+metadata). CVE-2026-113466 (Console) is addressed here by removing the legacy
+Console, not by repairing its session encryption. It also fixes Object Lock default retention and retention
 authorization, never checks for updates, and ignores `X-Forwarded-For`,
 `X-Real-IP` and `Forwarded` by default (behind a proxy that overwrites them, set
 `_MINIO_API_XFF_HEADER=on`). Some changes are visible to clients and
@@ -98,3 +93,6 @@ MinIO is named here for attribution; this fork is independently maintained and
 is not endorsed by the upstream project. Upstream and dependency copyright and
 license notices remain in place. Corresponding source and build instructions
 must accompany this project's distributions.
+
+CI uses the `toolchain` directive in `go.mod` (Go 1.26.10). See
+[CI coverage and verification](engineering/ci/README.md) for active checks and explicit gaps.

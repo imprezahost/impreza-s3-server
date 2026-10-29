@@ -13,15 +13,14 @@ func TestConsoleDefaultOff(t *testing.T) {
 	previous := globalBrowserEnabled
 	t.Cleanup(func() { globalBrowserEnabled = previous })
 	for _, tc := range []struct {
-		name    string
-		value   string
-		unset   bool
-		enabled bool
+		name  string
+		value string
+		unset bool
 	}{
 		{name: "unset", unset: true},
 		{name: "empty"},
 		{name: "explicit_off", value: "off"},
-		{name: "explicit_on", value: "on", enabled: true},
+		{name: "explicit_on", value: "on"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Setenv("MINIO_BROWSER", tc.value)
@@ -30,10 +29,10 @@ func TestConsoleDefaultOff(t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			globalBrowserEnabled = !tc.enabled
+			globalBrowserEnabled = true
 			serverHandleEarlyEnvVars()
-			if globalBrowserEnabled != tc.enabled {
-				t.Fatalf("Console enabled = %v, want %v", globalBrowserEnabled, tc.enabled)
+			if globalBrowserEnabled {
+				t.Fatal("removed Console became enabled")
 			}
 		})
 	}

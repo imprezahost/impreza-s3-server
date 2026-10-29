@@ -42,3 +42,6 @@ Use verify-offline.sh only in an environment where the tests' local listeners ar
 allowed, with an admitted local scanner and database. Preserve failures and record
 explicit skips; no scanner exit or local hash alone establishes security. Separate
 build environments are needed to investigate independent reproduction.
+
+CI selects Go from `go.mod`, whose `toolchain` directive pins Go 1.26.10.
+See [CI coverage and verification](../ci/README.md) for the checks and gaps.

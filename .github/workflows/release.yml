@@ -1,0 +1,117 @@
+name: Release (unsigned draft)
+
+# An rN tag builds the release the way every commit is built (two builds per architecture, compared byte for
+# byte), runs govulncheck, and leaves an unsigned DRAFT GitHub Release with the binaries, SHA256SUMS and BUILDINFO.txt.
+# Nothing here signs or publishes: the maintainer verifies, signs with minisign outside CI and publishes the draft by
+# hand (engineering/release/SIGNING.md). No repository secret is used, and no action runs with the write token.
+on:
+  push:
+    tags: ['r[0-9]*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  # The tag, read through the API (no checkout, no action): r<number>, annotated, pointing at this commit, on main,
+  # with exactly one "Upstream-Base: <40-hex>" line in its message; and the toolchain go.mod pins at this commit.
+  check:
+    name: Check the tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      upstream_base: ${{ steps.tag.outputs.upstream_base }}
+      toolchain: ${{ steps.tag.outputs.toolchain }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ github.ref_name }}
+      SOURCE: ${{ github.sha }}
+    steps:
+      - name: Tag, commit, upstream base and toolchain
+        id: tag
+        run: |
+          set -euo pipefail
+          [[ "$TAG" =~ ^r[0-9]{1,6}$ ]] || { echo "::error::only r<number> tags make a release"; exit 1; }
+          [[ "$SOURCE" =~ ^[0-9a-f]{40}$ ]] || { echo "::error::unexpected source commit"; exit 1; }
+          ref=$(gh api "repos/$GH_REPO/git/ref/tags/$TAG")
+          [ "$(jq -r .object.type <<<"$ref")" = tag ] || { echo "::error::the tag must be annotated: its message records the upstream base"; exit 1; }
+          obj=$(gh api "repos/$GH_REPO/git/tags/$(jq -r .object.sha <<<"$ref")")
+          [ "$(jq -r .object.type <<<"$obj")" = commit ] && [ "$(jq -r .object.sha <<<"$obj")" = "$SOURCE" ] || { echo "::error::the tag does not point at this commit"; exit 1; }
+          base=$(jq -r .message <<<"$obj" | tr -d '\r' | sed -n 's/^Upstream-Base: \([0-9a-f]\{40\}\)$/\1/p')
+          [ "$(printf '%s' "$base" | grep -c .)" = 1 ] || { echo "::error::the tag message needs exactly one line 'Upstream-Base: <40-hex upstream commit>'"; exit 1; }
+          status=$(gh api "repos/$GH_REPO/compare/$SOURCE...main" --jq .status)
+          case "$status" in ahead | identical) ;; *) echo "::error::the tagged commit is not on main"; exit 1 ;; esac
+          toolchain=$(gh api "repos/$GH_REPO/contents/go.mod?ref=$SOURCE" --jq .content | base64 -d | sed -n 's/^toolchain \(go[0-9][0-9.]*\)$/\1/p')
+          [[ "$toolchain" =~ ^go[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo "::error::go.mod has no toolchain line"; exit 1; }
+          { echo "upstream_base=$base"; echo "toolchain=$toolchain"; } >> "$GITHUB_OUTPUT"
+
+  # The build jobs, unchanged: build A and build B per architecture, byte comparison, SHA256SUMS per architecture.
+  build:
+    name: Reproducible build
+    needs: [check]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reproducible-build.yml
+
+  vulncheck:
+    name: govulncheck
+    needs: [check]
+    permissions:
+      contents: read
+    uses: ./.github/workflows/vulncheck.yml
+
+  # The only job with a write token, and it runs no action: gh (preinstalled on the runner) downloads this run's
+  # artifacts and creates the draft. A draft that already exists for the tag is not touched (gh fails).
+  draft:
+    name: Unsigned draft release
+    needs: [check, build, vulncheck]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ github.ref_name }}
+      RUN_ID: ${{ github.run_id }}
+      SOURCE: ${{ github.sha }}
+      UPSTREAM_BASE: ${{ needs.check.outputs.upstream_base }}
+      TOOLCHAIN: ${{ needs.check.outputs.toolchain }}
+    steps:
+      - name: Collect the compared builds
+        run: |
+          set -euo pipefail
+          gh run download "$RUN_ID" --dir art
+          mkdir dist
+          : > dist/SHA256SUMS
+          : > dist/BUILDINFO.txt
+          for arch in amd64 arm64; do
+            cp "art/build-a-$arch/minio" "dist/minio-linux-$arch"
+            want=$(head -n 1 "art/SHA256SUMS-$arch/SHA256SUMS" | cut -d ' ' -f 1)
+            got=$(sha256sum "dist/minio-linux-$arch" | cut -d ' ' -f 1)
+            [ -n "$want" ] && [ "$want" = "$got" ] || { echo "::error::linux/$arch: the binary is not the one the two builds agreed on"; exit 1; }
+            (cd dist && sha256sum "minio-linux-$arch") >> dist/SHA256SUMS
+            { echo "== linux/$arch"; cat "art/build-a-$arch/build-params.txt" "art/build-a-$arch/minio.buildinfo.txt"; } >> dist/BUILDINFO.txt
+          done
+          (cd dist && sha256sum --check SHA256SUMS)
+      - name: Create the draft
+        run: |
+          set -euo pipefail
+          [[ "$UPSTREAM_BASE" =~ ^[0-9a-f]{40}$ ]] && [[ "$TOOLCHAIN" =~ ^go[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || { echo "::error::tag check outputs missing"; exit 1; }
+          {
+            echo "Unsigned draft of $TAG. Each binary was built twice in CI and both builds were byte-identical."
+            echo
+            echo "- Source commit: $SOURCE"
+            echo "- Upstream base commit: $UPSTREAM_BASE"
+            echo "- Go toolchain: $TOOLCHAIN"
+            echo
+            echo "This draft is published only after the maintainer rebuilds it locally, signs SHA256SUMS and the binaries"
+            echo "with minisign outside CI and attaches the .minisig files. Verify against the public key and the sums"
+            echo "published outside GitHub, not against this page alone."
+          } > notes.md
+          gh release create "$TAG" --draft --verify-tag --title "$TAG" --notes-file notes.md \
+            dist/minio-linux-amd64 dist/minio-linux-arm64 dist/SHA256SUMS dist/BUILDINFO.txt

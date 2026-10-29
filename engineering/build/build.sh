@@ -14,9 +14,18 @@ git -C "$SRC" ls-files --error-unmatch go.mod go.sum >/dev/null
 [ -z "$(git -C "$ROOT" status --porcelain --untracked-files=all -- .)" ] || { echo 'uncommitted source/build inputs refused' >&2; exit 2; }
 (cd "$SRC" && sha256sum --check "$ROOT/engineering/build/dependency-lock.sha256")
 COMMIT=$(git -C "$ROOT" rev-parse HEAD)
-TOOLCHAIN=go1.26.10
+# One Go source: the toolchain comes from go.mod itself, never from a second
+# constant here (a drift between the two was found in independent review).
+TOOLCHAIN=$(sed -n 's/^toolchain \(go[0-9.]*\)$/\1/p' "$SRC/go.mod")
+[ -n "$TOOLCHAIN" ] || { echo 'go.mod has no toolchain line' >&2; exit 2; }
+GOARCH=${GOARCH:-amd64}
+case "$GOARCH" in
+  amd64) export GOAMD64=v1 ;;
+  arm64) unset GOAMD64 ;;
+  *) echo "unsupported GOARCH $GOARCH" >&2; exit 2 ;;
+esac
 export GOTOOLCHAIN=local GOENV=off GOWORK=off GOVCS='*:off'
-export CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOAMD64=v1
+export CGO_ENABLED=0 GOOS=linux
 export GOFLAGS='-mod=readonly -trimpath -buildvcs=false'
 # All module acquisition/verification precedes this offline build.
 export GOPROXY=off GOSUMDB=sum.golang.org GONOSUMDB= GOPRIVATE= GOINSECURE=
@@ -42,6 +51,7 @@ LDFLAGS+=" -X github.com/minio/minio/cmd.GOPATH= -X github.com/minio/minio/cmd.G
  echo "source_commit=$COMMIT"
  echo 'upstream_commit=9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a'
  echo "toolchain=$TOOLCHAIN"
+ echo "goarch=$GOARCH"
  echo "go.mod.sha256=$(sha256sum "$SRC/go.mod" | cut -d' ' -f1)"
  echo "go.sum.sha256=$(sha256sum "$SRC/go.sum" | cut -d' ' -f1)"
  echo "ldflags=$LDFLAGS"

@@ -21,7 +21,6 @@ import (
 	"net"
 	"net/http"
 
-	consoleapi "github.com/minio/console/api"
 	xhttp "github.com/minio/minio/internal/http"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/wildcard"
@@ -37,18 +36,6 @@ func newHTTPServerFn() *xhttp.Server {
 func setHTTPServer(h *xhttp.Server) {
 	globalObjLayerMutex.Lock()
 	globalHTTPServer = h
-	globalObjLayerMutex.Unlock()
-}
-
-func newConsoleServerFn() *consoleapi.Server {
-	globalObjLayerMutex.RLock()
-	defer globalObjLayerMutex.RUnlock()
-	return globalConsoleSrv
-}
-
-func setConsoleSrv(srv *consoleapi.Server) {
-	globalObjLayerMutex.Lock()
-	globalConsoleSrv = srv
 	globalObjLayerMutex.Unlock()
 }
 

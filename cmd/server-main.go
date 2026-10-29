@@ -1000,22 +1000,6 @@ func serverMain(ctx *cli.Context) {
 			globalIAMSys.Init(GlobalContext, newObject, globalEtcdClient, globalRefreshIAMInterval)
 		})
 
-		// Initialize Console UI
-		if globalBrowserEnabled {
-			bootstrapTrace("initConsoleServer", func() {
-				srv, err := initConsoleServer()
-				if err != nil {
-					logger.FatalIf(err, "Unable to initialize console service")
-				}
-
-				setConsoleSrv(srv)
-
-				go func() {
-					logger.FatalIf(newConsoleServerFn().Serve(), "Unable to initialize console server")
-				}()
-			})
-		}
-
 		// if we see FTP args, start FTP if possible
 		if len(globalServerCtxt.FTP) > 0 {
 			bootstrapTrace("go startFTPServer", func() {

@@ -6,9 +6,8 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 
 VERSION ?= $(shell git describe --tags)
-REPO ?= quay.io/minio
-TAG ?= $(REPO)/minio:$(VERSION)
 
+GOLANGCI_VERSION := v2.9.0
 GOLANGCI_DIR = .bin/golangci/$(GOLANGCI_VERSION)
 GOLANGCI = $(GOLANGCI_DIR)/golangci-lint
 
@@ -22,8 +21,9 @@ help: ## print this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}'
 
 getdeps: ## fetch necessary dependencies
-	@mkdir -p ${GOPATH}/bin
-	@echo "Installing golangci-lint" && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOLANGCI_DIR)
+	@mkdir -p $(GOLANGCI_DIR)
+	@echo "Installing golangci-lint $(GOLANGCI_VERSION)"
+	@GOTOOLCHAIN=local GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org GOBIN="$(abspath $(GOLANGCI_DIR))" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
 
 crosscompile: ## cross compile minio
 	@(env bash $(PWD)/buildscripts/cross-compile.sh)
@@ -95,17 +95,13 @@ test-iam: install-race ## verify IAM (external IDP, etcd backends)
 	@echo "Running tests for IAM (external IDP, etcd backends) with -race"
 	@MINIO_API_REQUESTS_MAX=10000 GORACE=history_size=7 CGO_ENABLED=1 go test -timeout 15m -race -tags kqueue,dev -v -run TestIAM* ./cmd
 
-test-iam-ldap-upgrade-import: install-race ## verify IAM (external LDAP IDP)
-	@echo "Running upgrade tests for IAM (LDAP backend)"
-	@env bash $(PWD)/buildscripts/minio-iam-ldap-upgrade-import-test.sh
+test-iam-import-with-missing-entities: ## DISABLED: external IAM fixture removed
+	@echo "DISABLED: test-iam-import-with-missing-entities coverage unavailable; see engineering/ci/README.md" >&2
+	@exit 1
 
-test-iam-import-with-missing-entities: install-race ## test import of external iam config withg missing entities
-	@echo "Test IAM import configurations with missing entities"
-	@env bash $(PWD)/docs/distributed/iam-import-with-missing-entities.sh
-
-test-iam-import-with-openid: install-race
-	@echo "Test IAM import configurations with openid"
-	@env bash $(PWD)/docs/distributed/iam-import-with-openid.sh
+test-iam-import-with-openid: ## DISABLED: external IAM fixture removed
+	@echo "DISABLED: test-iam-import-with-openid coverage unavailable; see engineering/ci/README.md" >&2
+	@exit 1
 
 test-sio-error:
 	@(env bash $(PWD)/docs/bucket/replication/sio-error.sh)
@@ -125,13 +121,13 @@ test-delete-marker-proxying:
 test-replication: install-race test-replication-2site test-replication-3site test-delete-replication test-sio-error test-delete-marker-proxying ## verify multi site replication
 	@echo "Running tests for replicating three sites"
 
-test-site-replication-ldap: install-race ## verify automatic site replication
-	@echo "Running tests for automatic site replication of IAM (with LDAP)"
-	@(env bash $(PWD)/docs/site-replication/run-multi-site-ldap.sh)
+test-site-replication-ldap: ## DISABLED: external IAM fixture removed
+	@echo "DISABLED: test-site-replication-ldap coverage unavailable; see engineering/ci/README.md" >&2
+	@exit 1
 
-test-site-replication-oidc: install-race ## verify automatic site replication
-	@echo "Running tests for automatic site replication of IAM (with OIDC)"
-	@(env bash $(PWD)/docs/site-replication/run-multi-site-oidc.sh)
+test-site-replication-oidc: ## DISABLED: external IAM fixture removed
+	@echo "DISABLED: test-site-replication-oidc coverage unavailable; see engineering/ci/README.md" >&2
+	@exit 1
 
 test-site-replication-minio: install-race ## verify automatic site replication
 	@echo "Running tests for automatic site replication of IAM (with MinIO IDP)"
@@ -180,45 +176,6 @@ build: checks build-debugging ## builds minio to $(PWD)
 	@echo "Building minio binary to './minio'"
 	@CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -tags kqueue -trimpath --ldflags "$(LDFLAGS)" -o $(PWD)/minio 1>/dev/null
 
-hotfix-vars:
-	$(eval LDFLAGS := $(shell MINIO_RELEASE="RELEASE" MINIO_HOTFIX="hotfix.$(shell git rev-parse --short HEAD)" go run buildscripts/gen-ldflags.go $(shell git describe --tags --abbrev=0 | \
-    sed 's#RELEASE\.\([0-9]\+\)-\([0-9]\+\)-\([0-9]\+\)T\([0-9]\+\)-\([0-9]\+\)-\([0-9]\+\)Z#\1-\2-\3T\4:\5:\6Z#')))
-	$(eval VERSION := $(shell git describe --tags --abbrev=0).hotfix.$(shell git rev-parse --short HEAD))
-
-hotfix: hotfix-vars clean install ## builds minio binary with hotfix tags
-	@wget -q -c https://github.com/minio/pkger/releases/download/v2.3.11/pkger_2.3.11_linux_amd64.deb
-	@wget -q -c https://raw.githubusercontent.com/minio/minio-service/v1.1.1/linux-systemd/distributed/minio.service
-	@sudo apt install ./pkger_2.3.11_linux_amd64.deb --yes
-	@mkdir -p minio-release/$(GOOS)-$(GOARCH)/archive
-	@cp -af ./minio minio-release/$(GOOS)-$(GOARCH)/minio
-	@cp -af ./minio minio-release/$(GOOS)-$(GOARCH)/minio.$(VERSION)
-	@minisign -qQSm minio-release/$(GOOS)-$(GOARCH)/minio.$(VERSION) -s "${CRED_DIR}/minisign.key" < "${CRED_DIR}/minisign-passphrase"
-	@sha256sum < minio-release/$(GOOS)-$(GOARCH)/minio.$(VERSION) | sed 's, -,minio.$(VERSION),g' > minio-release/$(GOOS)-$(GOARCH)/minio.$(VERSION).sha256sum
-	@cp -af minio-release/$(GOOS)-$(GOARCH)/minio.$(VERSION)* minio-release/$(GOOS)-$(GOARCH)/archive/
-	@pkger -r $(VERSION) --ignore
-
-hotfix-push: hotfix
-	@scp -q -r minio-release/$(GOOS)-$(GOARCH)/* minio@dl-0.minio.io:~/releases/server/minio/hotfixes/linux-$(GOOS)/
-	@scp -q -r minio-release/$(GOOS)-$(GOARCH)/* minio@dl-0.minio.io:~/releases/server/minio/hotfixes/linux-$(GOOS)/archive
-	@scp -q -r minio-release/$(GOOS)-$(GOARCH)/* minio@dl-1.minio.io:~/releases/server/minio/hotfixes/linux-$(GOOS)/
-	@scp -q -r minio-release/$(GOOS)-$(GOARCH)/* minio@dl-1.minio.io:~/releases/server/minio/hotfixes/linux-$(GOOS)/archive
-	@echo "Published new hotfix binaries at https://dl.min.io/server/minio/hotfixes/linux-$(GOOS)/archive/minio.$(VERSION)"
-
-docker-hotfix-push: docker-hotfix
-	@docker push -q $(TAG) && echo "Published new container $(TAG)"
-
-docker-hotfix: hotfix-push checks ## builds minio docker container with hotfix tags
-	@echo "Building minio docker image '$(TAG)'"
-	@docker build -q --no-cache -t $(TAG) --build-arg RELEASE=$(VERSION) . -f Dockerfile.hotfix
-
-docker: build ## builds minio docker container
-	@echo "Building minio docker image '$(TAG)'"
-	@docker build -q --no-cache -t $(TAG) . -f Dockerfile
-
-test-resiliency: build
-	@echo "Running resiliency tests"
-	@(DOCKER_COMPOSE_FILE=$(PWD)/docs/resiliency/docker-compose.yaml env bash $(PWD)/docs/resiliency/resiliency-tests.sh)
-
 install-race: checks build-debugging ## builds minio to $(PWD)
 	@echo "Building minio binary with -race to './minio'"
 	@GORACE=history_size=7 CGO_ENABLED=1 go build -tags kqueue,dev -race -trimpath --ldflags "$(LDFLAGS)" -o $(PWD)/minio 1>/dev/null
@@ -240,6 +197,4 @@ clean: ## cleanup all generated assets
 	@rm -rvf build
 	@rm -rvf release
 	@rm -rvf .verify*
-	@rm -rvf minio-release
-	@rm -rvf minio.RELEASE*.hotfix.*
-	@rm -rvf pkger_*.deb
+	@rm -rvf release

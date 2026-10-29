@@ -1,14 +1,15 @@
 name: MinIO advanced tests
 
 on:
+  push:
+    branches: [main]
   pull_request:
-    branches:
-      - master
+    branches: [main]
 
 # This ensures that previous jobs for the PR are canceled when the PR is
 # updated.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -16,26 +17,29 @@ permissions:
 
 jobs:
   replication-test:
-    name: Advanced Tests with Go ${{ matrix.go-version }}
+    # DISABLED: decommission, ILM, policy, config, replication, versioning and multipart integration coverage needs fork-owned client fixtures; see engineering/ci/README.md.
+    if: ${{ false }}
+    name: Advanced Tests with Go from go.mod
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        go-version: [1.24.x]
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
-          check-latest: true
+          go-version-file: go.mod
       - name: Test Decom
+        # DISABLED: Test Decom upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
           make test-decom
 
       - name: Test ILM
+        # DISABLED: Test ILM upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
@@ -43,30 +47,40 @@ jobs:
           make test-ilm-transition
 
       - name: Test PBAC
+        # DISABLED: Test PBAC upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
           make test-pbac
 
       - name: Test Config File
+        # DISABLED: Test Config File upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
           make test-configfile
 
       - name: Test Replication
+        # DISABLED: Test Replication upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
           make test-replication
 
       - name: Test MinIO IDP for automatic site replication
+        # DISABLED: Test MinIO IDP for automatic site replication upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0
           make test-site-replication-minio
 
       - name: Test Versioning
+        # DISABLED: Test Versioning upstream fixture coverage unavailable; see CI README.
+        if: ${{ false }}
         run: |
           sudo sysctl net.ipv6.conf.all.disable_ipv6=0
           sudo sysctl net.ipv6.conf.default.disable_ipv6=0

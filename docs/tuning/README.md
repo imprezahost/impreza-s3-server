@@ -9,9 +9,9 @@ Please make sure the following packages are already installed via `dnf` or `apt`
 
 ### Install `tuned.conf` performance profile
 
-#### Step 1 - download `tuned.conf` from the referenced link
+#### Step 1 - use the reviewed `tuned.conf` tracked in this repository
 ```
-wget https://raw.githubusercontent.com/minio/minio/master/docs/tuning/tuned.conf
+cp docs/tuning/tuned.conf ./tuned.conf
 ```
 
 #### Step 2 - install tuned.conf as supported performance profile on all nodes

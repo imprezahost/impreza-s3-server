@@ -4,23 +4,26 @@ under the terms of the [Apache 2 license](https://www.apache.org/licenses/LICENS
 By creating this pull request I represent that I have the right to license the 
 contributions to the project maintainers under the Apache 2 license.
 
-## Description
+<!--- Security reports and fixes for vulnerabilities that are not yet public
+never go in a pull request: follow SECURITY.md and report privately. -->
+
+## Issue
+<!--- The issue this pull request resolves. Feature pull requests are out of
+scope (see CONTRIBUTING.md) and are closed without review. -->
+
+## Defect
 
 
-## Motivation and Context
+## Fix
 
 
-## How to test this PR?
+## Verification
+<!--- Commands run and their result. A security change names the test that
+fails without it. -->
 
 
-## Types of changes
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Optimization (provides speedup with no functional changes)
-- [ ] Breaking change (fix or feature that would cause existing functionality to change)
-
-## Checklist:
-- [ ] Fixes a regression (If yes, please add `commit-id` or `PR #` here)
-- [ ] Unit tests added/updated
-- [ ] Internal documentation updated
-- [ ] Create a documentation update request [here](https://github.com/minio/docs/issues/new?label=doc-change,title=Doc+Updated+Needed+For+PR+github.com%2fminio%2fminio%2fpull%2fNNNNN)
+## Checklist
+- [ ] Targets `next` and addresses a single concern
+- [ ] Test added or extended (fails without the change)
+- [ ] `make verify` passes with the toolchain pinned in `go.mod` and the tracked dependency lock
+- [ ] Documentation that ships with the release updated, if behavior changed

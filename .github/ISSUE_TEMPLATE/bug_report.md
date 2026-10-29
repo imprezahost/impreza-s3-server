@@ -1,54 +1,34 @@
 ---
 name: Bug report
-about: Report a bug in MinIO (community edition is source-only)
+about: Report a defect in the Impreza S3 server (security reports never go here)
 title: ''
-labels: community, triage
+labels: triage
 assignees: ''
 
 ---
 
-## IMPORTANT NOTES
+## Important
 
-**Community Edition**: MinIO community edition is now source-only. Install via `go install github.com/minio/minio@latest`
+**Security reports never go in an issue.** Report privately through the
+portal as described in
+[SECURITY.md](https://github.com/imprezahost/impreza-s3-server/blob/HEAD/SECURITY.md)
+and include the source commit, the toolchain and a minimal reproduction with
+synthetic data. An issue is only for defects in security, build or
+maintenance scope — see
+[CONTRIBUTING.md](https://github.com/imprezahost/impreza-s3-server/blob/HEAD/CONTRIBUTING.md).
+Feature requests are out of scope.
 
-**Feature Requests**: We are no longer accepting feature requests for the community edition. For feature requests and enterprise support, please subscribe to [MinIO Enterprise Support](https://min.io/pricing).
+## Defect
 
-**Urgent Issues**: If this case is urgent or affects production, please subscribe to [SUBNET](https://min.io/pricing) for 24/7 enterprise support.
+**Source commit** (`git rev-parse HEAD`):
 
-<!--- Provide a general summary of the issue in the Title above -->
+**Build** (toolchain and dependency lock used):
 
-## Expected Behavior
-<!--- If you're describing a bug, tell us what should happen -->
-<!--- If you're suggesting a change/improvement, tell us how it should work -->
+**What happened** (configuration, expected behavior, observed behavior):
 
-## Current Behavior
-<!--- If describing a bug, tell us what happens instead of the expected behavior -->
-<!--- If suggesting a change/improvement, explain the difference from current behavior -->
+**Minimal reproduction** with synthetic data — no credentials, access keys,
+customer data or private endpoints:
 
-## Possible Solution
-<!--- Not obligatory, but suggest a fix/reason for the bug, -->
-<!--- or ideas how to implement the addition or change -->
-
-## Steps to Reproduce (for bugs)
-<!--- Provide a link to a live example, or an unambiguous set of steps to -->
-<!--- reproduce this bug. Include code to reproduce, if relevant -->
-<!--- and make sure you have followed https://github.com/minio/minio/tree/release/docs/debugging to capture relevant logs -->
-
-1.
-2.
-3.
-4.
-
-## Context
-<!--- How has this issue affected you? What are you trying to accomplish? -->
-<!--- Providing context helps us come up with a solution that is most useful in the real world -->
-
-## Regression
-<!-- Is this issue a regression? (Yes / No) -->
-<!-- If Yes, optionally please include minio version or commit id or PR# that caused this regression, if you have these details. -->
-
-## Your Environment
-<!--- Include as many relevant details about the environment you experienced the bug in -->
-* Version used (`minio --version`):
-* Server setup and configuration:
-* Operating System and version (`uname -a`):
+```
+# commands and output
+```

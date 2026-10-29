@@ -2,40 +2,9 @@
 
 MinIO uses a key-management-system (KMS) to support SSE-S3. If a client requests SSE-S3, or auto-encryption is enabled, the MinIO server encrypts each object with a unique object key which is protected by a master key managed by the KMS.
 
-## Quick Start
+## Retired public quick-start
 
-MinIO supports multiple KMS implementations via our [KES](https://github.com/minio/kes#kes) project. We run a KES instance at `https://play.min.io:7373` for you to experiment and quickly get started. To run MinIO with a KMS just fetch the root identity, set the following environment variables and then start your MinIO server. If you haven't installed MinIO, yet, then follow the MinIO [install instructions](https://docs.min.io/community/minio-object-store/operations/deployments/baremetal-deploy-minio-on-redhat-linux.html) first.
-
-### 1. Fetch the root identity
-
-As the initial step, fetch the private key and certificate of the root identity:
-
-```sh
-curl -sSL --tlsv1.2 \
-     -O 'https://raw.githubusercontent.com/minio/kes/master/root.key' \
-     -O 'https://raw.githubusercontent.com/minio/kes/master/root.cert'
-```
-
-### 2. Set the MinIO-KES configuration
-
-```sh
-export MINIO_KMS_KES_ENDPOINT=https://play.min.io:7373
-export MINIO_KMS_KES_KEY_FILE=root.key
-export MINIO_KMS_KES_CERT_FILE=root.cert
-export MINIO_KMS_KES_KEY_NAME=my-minio-key
-```
-
-### 3. Start the MinIO Server
-
-```sh
-export MINIO_ROOT_USER=minio
-export MINIO_ROOT_PASSWORD=minio123
-minio server ~/export
-```
-
-> The KES instance at `https://play.min.io:7373` is meant to experiment and provides a way to get started quickly.
-> Note that anyone can access or delete master keys at `https://play.min.io:7373`. You should run your own KES
-> instance in production.
+DISABLED: the inherited quick-start fetched shared upstream private key and certificate files and used a public KES service. It is removed. Coverage lost: the public-KES experiment. This fork requires a separately admitted KMS endpoint and locally generated credentials; this guide does not provision either.
 
 ## Configuration Guides
 

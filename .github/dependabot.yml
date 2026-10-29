@@ -1,0 +1,22 @@
+version: 2
+# Enable Dependabot alerts and security updates in the GitHub repository settings.
+# Security PRs are advisory-triggered, independent of this weekly version schedule.
+# No target-branch, cooldown or automatic merge: security updates use the default
+# branch, with human review/merge. Only routine version updates are grouped.
+updates:
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      go-dependencies:
+        applies-to: version-updates
+        patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      action-dependencies:
+        applies-to: version-updates
+        patterns: ["*"]
