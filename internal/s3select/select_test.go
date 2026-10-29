@@ -26,6 +26,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/klauspost/cpuid/v2"
@@ -70,6 +71,24 @@ func (w *testResponseWriter) WriteHeader(statusCode int) {
 func (w *testResponseWriter) Flush() {
 }
 
+// lockedBody serializes reads of the response body. On an error event
+// minio-go's decoder goroutine drains and closes the body while the caller's
+// Close does the same; a bytes.Reader is not safe for that.
+type lockedBody struct {
+	mu sync.Mutex
+	r  io.Reader
+}
+
+func (b *lockedBody) Read(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.r.Read(p)
+}
+
+func (b *lockedBody) Close() error {
+	return nil
+}
+
 func evaluateSelectForTest(t *testing.T, requestXML, input []byte) ([]byte, error) {
 	t.Helper()
 
@@ -87,7 +106,7 @@ func evaluateSelectForTest(t *testing.T, requestXML, input []byte) ([]byte, erro
 
 	resp := http.Response{
 		StatusCode:    http.StatusOK,
-		Body:          io.NopCloser(bytes.NewReader(w.response)),
+		Body:          &lockedBody{r: bytes.NewReader(w.response)},
 		ContentLength: int64(len(w.response)),
 	}
 	res, err := minio.NewSelectResults(&resp, "testbucket")
