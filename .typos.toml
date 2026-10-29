@@ -1,9 +1,20 @@
 # Point exceptions, nothing broader: identifiers inherited from upstream
 # benchmark/test and storage code (renaming them would drift the fork with
 # no reader value). Real typos are fixed in the source instead.
+[default]
+# gpg --with-colons tags the fingerprint record with a three-letter format
+# token (not a word) that engineering/ci/verify.cjs matches once, as the
+# start of a line followed by nine colons. Written with a class here so this
+# file does not spell it either.
+extend-ignore-re = ["\\^f[p]r:{9}"]
+
 [default.extend-identifiers]
 cpy = "cpy"
 sterr = "sterr"
+
+# CNA: CVE Numbering Authority, the acronym in SECURITY.md's CVE record link.
+[default.extend-words]
+cna = "cna"
 
 # The armored public key is base64, not prose: any word typos finds there is
 # chance, and editing the file would change the published key bytes.

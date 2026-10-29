@@ -287,9 +287,9 @@ console.log('NEGATIVE PASS: stale dependency lock');
     fs.rmSync(path.join(tree, 'README.md'), {force: true});
     // Portuguese in public texts is refused (accented and unaccented);
     // inherited Go unicode test data stays out of the language rule.
-    fs.writeFileSync(path.join(tree, 'README.md'), 'Prazo: a defin' + 'ir pe' + 'lo mantened' + 'or.\n');
+    fs.writeFileSync(path.join(tree, 'README.md'), 'Prazo: a de' + 'finir pe' + 'lo mantened' + 'or.\n');
     assert.throws(()=>rules.internalIds(tree), assert.AssertionError, 'Portuguese text reintroduced');
-    fs.writeFileSync(path.join(tree, 'README.md'), 'O prazo n\u00e3o foi defin' + 'ido.\n');
+    fs.writeFileSync(path.join(tree, 'README.md'), 'O prazo n\u00e3o foi de' + 'finido.\n');
     assert.throws(()=>rules.internalIds(tree), assert.AssertionError, 'accented Portuguese reintroduced');
     fs.rmSync(path.join(tree, 'README.md'), {force: true});
     fs.writeFileSync(path.join(tree, 'testdata.go'), 'valid := []string{"t\u00e1bl\u00eb"}\npackage target\n');
@@ -311,7 +311,7 @@ console.log('NEGATIVE PASS: stale dependency lock');
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 's3-key-'));
   fs.mkdirSync(path.join(tmp, 'gnupg'), {mode: 0o700});
   try {
-    const readFpr = text => {
+    const readFingerprint = text => {
       fs.writeFileSync(path.join(tmp, 'k.asc'), text);
       // A private, empty home: no keyring, options or trustdb of the runner or
       // developer is read, and nothing is written outside the temporary dir.
@@ -319,19 +319,19 @@ console.log('NEGATIVE PASS: stale dependency lock');
       if (r.status !== 0) return null;
       return (r.stdout.match(/^fpr:::::::::([0-9A-F]{40})/m) || [])[1] ?? null;
     };
-    const fpr = readFpr(asc);
-    check(fpr !== null, 'SECURITY-KEY.asc parses as an OpenPGP public key (gpg present)');
+    const fingerprint = readFingerprint(asc);
+    check(fingerprint !== null, 'SECURITY-KEY.asc parses as an OpenPGP public key (gpg present)');
     const sec = fs.readFileSync(path.join(root, 'SECURITY.md'), 'utf8');
     const doc = sec.match(/Fingerprint: `([0-9A-F ]+)`/);
     check(doc !== null, 'SECURITY.md publishes the fingerprint in the expected form');
-    if (fpr !== null && doc !== null) {
-      check(doc[1].replace(/ /g, '') === fpr, 'SECURITY-KEY.asc carries exactly the fingerprint SECURITY.md names');
+    if (fingerprint !== null && doc !== null) {
+      check(doc[1].replace(/ /g, '') === fingerprint, 'SECURITY-KEY.asc carries exactly the fingerprint SECURITY.md names');
       // Negative: flip one base64 character inside the key body — the file
       // must no longer match the published fingerprint (or not parse at all).
       const lines = asc.split('\n');
       const bodyIdx = lines.findIndex((l, i) => i > 0 && l.length > 10 && /^[A-Za-z0-9+/=]+$/.test(l));
       lines[bodyIdx] = lines[bodyIdx].slice(0, 3) + (lines[bodyIdx][3] === 'A' ? 'B' : 'A') + lines[bodyIdx].slice(4);
-      check(readFpr(lines.join('\n')) !== fpr, 'a mutated key file no longer matches the published fingerprint');
+      check(readFingerprint(lines.join('\n')) !== fingerprint, 'a mutated key file no longer matches the published fingerprint');
       console.log('NEGATIVE PASS: SECURITY-KEY.asc fingerprint matches SECURITY.md; a mutated key does not');
     }
   } finally { fs.rmSync(tmp, {recursive:true, force:true}); }

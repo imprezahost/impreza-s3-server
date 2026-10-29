@@ -88,14 +88,14 @@ func GetSourceScheme(r *http.Request) string {
 	return scheme
 }
 
+// GetSourceIPFromHeaders retrieves the IP from the X-Forwarded-For, X-Real-IP
+// and RFC7239 Forwarded headers (in that order), only when trustForwardedHeaders
+// is on. Otherwise it returns "" and callers use the connection's address.
+//
 // SECURITY NOTE: when trustForwardedHeaders is on, these headers are trusted from any peer: there is no
 // trusted-proxy boundary. Turn it on only when every request reaches the server through a proxy that overwrites
 // X-Forwarded-For, X-Real-IP and Forwarded; otherwise a client can set the address the rest of the process
 // believes it came from, including aws:SourceIp.
-//
-// GetSourceIPFromHeaders retrieves the IP from the X-Forwarded-For, X-Real-IP
-// and RFC7239 Forwarded headers (in that order), only when trustForwardedHeaders
-// is on. Otherwise it returns "" and callers use the connection's address.
 func GetSourceIPFromHeaders(r *http.Request) string {
 	var addr string
 

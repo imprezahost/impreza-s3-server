@@ -430,16 +430,6 @@ func getUpdateTransport(timeout time.Duration) http.RoundTripper {
 	return updateTransport
 }
 
-func getLatestReleaseTime(u *url.URL, timeout time.Duration, mode string) (sha256Sum []byte, releaseTime time.Time, err error) {
-	data, err := downloadReleaseURL(u, timeout, mode)
-	if err != nil {
-		return sha256Sum, releaseTime, err
-	}
-
-	sha256Sum, releaseTime, _, err = parseReleaseData(data)
-	return sha256Sum, releaseTime, err
-}
-
 const (
 	// Kubernetes deployment doc link.
 	kubernetesDeploymentDoc = "https://docs.min.io/community/minio-object-store/operations/deployments/kubernetes.html"

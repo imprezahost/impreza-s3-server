@@ -55,7 +55,7 @@ function releasePins(tree, check = assert.ok) {
 function installScript(script, name, check = assert.ok) {
   const text = script.replace(/\\\r?\n/g, ' ');
   check(!/@latest\b/i.test(text), `${name}: no floating latest tool`);
-  check(!/\b(?:curl|wget)\b[^\n;]*\|\s*(?:sudo\s+(?:-\S+\s+)*)?(?:\/(?:usr\/)?bin\/)?(?:ba)?sh\b/.test(text), `${name}: no fetched installer piped to a shell`);
+  check(!/\b(?:curl|wget)\b[^\n;]*\|\s*(?:sudo\s+(?:-\S+\s+)*)?(?:\/(?:usr\/)?bin\/)?(?:bash|sh)\b/.test(text), `${name}: no fetched installer piped to a shell`);
   for (const raw of text.split(/[\n;&|]+/)) {
     const line = raw.replace(/\s+#.*$/, '').trim();
     if (!line || line.startsWith('#')) continue;
@@ -113,7 +113,7 @@ const ID_NAMES = /^(?:Makefile|Dockerfile(?:\..+)?)$/;
 // The patterns are built from escapes/concatenations so this very file keeps
 // passing the rule.
 const PT_ACCENTED = new RegExp('[\\u00e3\\u00e1\\u00e0\\u00e2\\u00e9\\u00ea\\u00ed\\u00f3\\u00f4\\u00f5\\u00fa\\u00e7]', 'i');
-const PT_WORDS = new RegExp('\\b(?:n\\u00e3o|pe' + 'lo|pe' + 'la|mantened' + 'or|defin' + 'ir|reposit\\u00f3rio|manuten\\u00e7\\u00e3o|configura\\u00e7\\u00e3o)\\b', 'i');
+const PT_WORDS = new RegExp('\\b(?:n\\u00e3o|pe' + 'lo|pe' + 'la|mantened' + 'or|de' + 'finir|reposit\\u00f3rio|manuten\\u00e7\\u00e3o|configura\\u00e7\\u00e3o)\\b', 'i');
 const PT_TEXT = /\.(?:md|markdown|mjs|cjs|js|py|sh|ya?ml|json|txt|html|tpl|toml|cfg|conf|ini)$/i;
 function internalIds(tree, check = assert.ok) {
   function walk(dir) {

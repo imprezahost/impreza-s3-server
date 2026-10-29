@@ -50,12 +50,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for _, opt_in := range []bool{false, true} {
+	for _, optIn := range []bool{false, true} {
 		ctx := build.Default
 		ctx.GOOS = "linux"
 		ctx.GOARCH = "amd64"
 		ctx.BuildTags = []string{"kqueue"}
-		if opt_in {
+		if optIn {
 			ctx.BuildTags = append(ctx.BuildTags, "minio_console")
 		}
 		found := 0
@@ -92,7 +92,7 @@ func main() {
 		if found != 0 {
 			fail("legacy Console remains with old build tag")
 		}
-		fmt.Printf("PASS: linux/amd64 source selection minio_console=%v Console imports=%d\n", opt_in, found)
+		fmt.Printf("PASS: linux/amd64 source selection minio_console=%v Console imports=%d\n", optIn, found)
 	}
 	// Execute the exact three updater functions in
 	// a stdlib-only package. This does not certify their full server integration.

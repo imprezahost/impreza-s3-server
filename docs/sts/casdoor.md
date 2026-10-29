@@ -79,7 +79,7 @@ Once successfully set restart the MinIO instance.
 mc admin service restart myminio
 ```
 
-### Using WebIdentiy API
+### Using WebIdentity API
 
 On another terminal run `web-identity.go` a sample client application which obtains JWT id_tokens from an identity provider, in our case its Keycloak. Uses the returned id_token response to get new temporary credentials from the MinIO server using the STS API call `AssumeRoleWithWebIdentity`.
 

@@ -134,7 +134,7 @@ Once successfully set restart the MinIO instance.
 mc admin service restart myminio
 ```
 
-### Using WebIdentiy API
+### Using WebIdentity API
 
 Client ID can be found by clicking any of the clients listed [here](http://localhost:8080/auth/admin/master/console/#/realms/minio/clients). If you have followed the above steps docs, the default Client ID will be `account`.
 
