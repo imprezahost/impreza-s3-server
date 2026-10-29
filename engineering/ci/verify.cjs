@@ -40,8 +40,14 @@ function validate(doc, text, name) {
     for (const step of job.steps) {
       check(Boolean(step.run) !== Boolean(step.uses), `${name}/${id}: exactly one run or uses`);
       if (step.uses?.startsWith('actions/setup-go@')) {
-        check(step.with?.['go-version-file'] === 'go.mod', `${name}/${id}: one Go source`);
-        check(!('go-version' in step.with) && !('cached' in step.with), `${name}/${id}: valid setup-go inputs`);
+        // One Go source: either the module file directly, or the exact
+        // toolchain DERIVED from go.mod by a step of this job (setup-go
+        // ignores the toolchain line; build.sh pins GOTOOLCHAIN=local).
+        const derived = job.steps.some(s => /sed -n 's\/\^toolchain go\/\/p' go\.mod/.test(String(s.run ?? '')));
+        const okVersion = step.with?.['go-version-file'] === 'go.mod'
+          || (step.with?.['go-version'] === '${{ env.GO_TOOLCHAIN }}' && derived);
+        check(okVersion, `${name}/${id}: one Go source (go.mod, directly or derived)`);
+        check(!(step.with?.['go-version-file'] !== undefined && 'go-version' in step.with) && !('cached' in step.with), `${name}/${id}: valid setup-go inputs`);
       }
       if (step.uses?.startsWith('actions/checkout@')) check(step.with?.['persist-credentials'] === false, `${name}/${id}: do not persist token`);
       for (const value of Object.values(step.env ?? {})) check(['string', 'number'].includes(typeof value), `${name}/${id}: env scalar`);
@@ -273,10 +279,62 @@ console.log('NEGATIVE PASS: stale dependency lock');
     fs.writeFileSync(path.join(tree, 'certs.go'), '// LoadX509KeyPair - load an X509 key pair\npackage config\n');
     rules.internalIds(tree);
     fs.rmSync(path.join(tree, 'certs.go'));
+    // A full OpenPGP fingerprint passes; a ticket on a line that merely mentions PGP does not.
+    fs.writeFileSync(path.join(tree, 'README.md'), 'Fingerprint: `FD4A F833 BBA6 D9B8 B890  B1AE 8BF2 4F8D E8F9 50F9`\n');
+    rules.internalIds(tree);
+    fs.writeFileSync(path.join(tree, 'README.md'), `The PGP key was rotated in ${'X' + '826'}.\n`);
+    assert.throws(()=>rules.internalIds(tree), assert.AssertionError, 'ticket on a PGP line');
+    fs.rmSync(path.join(tree, 'README.md'), {force: true});
+    // Portuguese in public texts is refused (accented and unaccented);
+    // inherited Go unicode test data stays out of the language rule.
+    fs.writeFileSync(path.join(tree, 'README.md'), 'Prazo: a defin' + 'ir pe' + 'lo mantened' + 'or.\n');
+    assert.throws(()=>rules.internalIds(tree), assert.AssertionError, 'Portuguese text reintroduced');
+    fs.writeFileSync(path.join(tree, 'README.md'), 'O prazo n\u00e3o foi defin' + 'ido.\n');
+    assert.throws(()=>rules.internalIds(tree), assert.AssertionError, 'accented Portuguese reintroduced');
+    fs.rmSync(path.join(tree, 'README.md'), {force: true});
+    fs.writeFileSync(path.join(tree, 'testdata.go'), 'valid := []string{"t\u00e1bl\u00eb"}\npackage target\n');
+    rules.internalIds(tree);
+    fs.rmSync(path.join(tree, 'testdata.go'));
     fs.writeFileSync(path.join(tree, 'README.md'), 'X86-64 CPUs, X25519 curves and the X000 benchmark labels are technical tokens.\n');
     rules.internalIds(tree);
-    console.log('NEGATIVE PASS: internal change ID, ticket, session, feature, role (text, Go, Makefile) refused; technical tokens pass');
+    console.log('NEGATIVE PASS: internal change ID, ticket, session, feature, role (text, Go, Makefile) refused; Portuguese refused in texts; technical tokens pass');
   } finally { fs.rmSync(tree, {recursive:true, force:true}); }
+}
+// The published SECURITY-KEY.asc is the maintainer's exact export: it parses
+// as an OpenPGP key and its primary fingerprint is the one SECURITY.md
+// names. gpg reads the key (ubuntu runners and dev boxes ship it); a missing
+// gpg fails closed instead of skipping the check.
+{
+  const ascPath = path.join(root, 'SECURITY-KEY.asc');
+  check(fs.existsSync(ascPath), 'SECURITY-KEY.asc: the public key file ships in the repository');
+  const asc = fs.readFileSync(ascPath, 'utf8');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 's3-key-'));
+  fs.mkdirSync(path.join(tmp, 'gnupg'), {mode: 0o700});
+  try {
+    const readFpr = text => {
+      fs.writeFileSync(path.join(tmp, 'k.asc'), text);
+      // A private, empty home: no keyring, options or trustdb of the runner or
+      // developer is read, and nothing is written outside the temporary dir.
+      const r = cp.spawnSync('gpg', ['--homedir', path.join(tmp, 'gnupg'), '--batch', '--no-options', '--show-keys', '--with-colons', path.join(tmp, 'k.asc')], {encoding: 'utf8'});
+      if (r.status !== 0) return null;
+      return (r.stdout.match(/^fpr:::::::::([0-9A-F]{40})/m) || [])[1] ?? null;
+    };
+    const fpr = readFpr(asc);
+    check(fpr !== null, 'SECURITY-KEY.asc parses as an OpenPGP public key (gpg present)');
+    const sec = fs.readFileSync(path.join(root, 'SECURITY.md'), 'utf8');
+    const doc = sec.match(/Fingerprint: `([0-9A-F ]+)`/);
+    check(doc !== null, 'SECURITY.md publishes the fingerprint in the expected form');
+    if (fpr !== null && doc !== null) {
+      check(doc[1].replace(/ /g, '') === fpr, 'SECURITY-KEY.asc carries exactly the fingerprint SECURITY.md names');
+      // Negative: flip one base64 character inside the key body — the file
+      // must no longer match the published fingerprint (or not parse at all).
+      const lines = asc.split('\n');
+      const bodyIdx = lines.findIndex((l, i) => i > 0 && l.length > 10 && /^[A-Za-z0-9+/=]+$/.test(l));
+      lines[bodyIdx] = lines[bodyIdx].slice(0, 3) + (lines[bodyIdx][3] === 'A' ? 'B' : 'A') + lines[bodyIdx].slice(4);
+      check(readFpr(lines.join('\n')) !== fpr, 'a mutated key file no longer matches the published fingerprint');
+      console.log('NEGATIVE PASS: SECURITY-KEY.asc fingerprint matches SECURITY.md; a mutated key does not');
+    }
+  } finally { fs.rmSync(tmp, {recursive:true, force:true}); }
 }
 // Negative controls: each mutation of the real release workflow must fail validateRelease by assertion. The text
 // rules read yaml.dump of the mutated document, so a mutation reaches them too.
@@ -371,5 +429,5 @@ let toolNegatives = 0;
     rules.toolInstalls(doc, yaml.dump(doc), 'exact version syntax control');
   }
 }
-console.log(`PASS: ${files.length} workflow YAMLs; ${checks} assertions; BASE=${base ?? 'not requested'}; ${14 + releaseNegatives + toolNegatives + 3} negative controls`);
+console.log(`PASS: ${files.length} workflow YAMLs; ${checks} assertions; BASE=${base ?? 'not requested'}; ${14 + releaseNegatives + toolNegatives + 4} negative controls`);
 console.log('LIMIT: structural/dispatch checks, not actionlint expression/shell lint or execution of GitHub-hosted jobs.');

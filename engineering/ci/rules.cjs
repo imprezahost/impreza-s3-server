@@ -106,6 +106,15 @@ const INTERNAL_ROLE = new RegExp('\\b' + 'mae' + 'stro' + '\\b');
 const ID_TEXT = /\.(?:md|markdown|mjs|cjs|js|py|sh|ya?ml|json|txt|html|tpl|toml|cfg|conf|ini|go|mk)$/i;
 // Build files without an extension carry comments too (the Makefile had internal IDs).
 const ID_NAMES = /^(?:Makefile|Dockerfile(?:\..+)?)$/;
+// The public texts are English-only. Portuguese surfaces as accented letters
+// or a closed list of unaccented Portuguese words that are not standalone
+// English words. Inherited Go code is out of this language rule: upstream
+// test data legitimately carries non-English diacritics and German comments.
+// The patterns are built from escapes/concatenations so this very file keeps
+// passing the rule.
+const PT_ACCENTED = new RegExp('[\\u00e3\\u00e1\\u00e0\\u00e2\\u00e9\\u00ea\\u00ed\\u00f3\\u00f4\\u00f5\\u00fa\\u00e7]', 'i');
+const PT_WORDS = new RegExp('\\b(?:n\\u00e3o|pe' + 'lo|pe' + 'la|mantened' + 'or|defin' + 'ir|reposit\\u00f3rio|manuten\\u00e7\\u00e3o|configura\\u00e7\\u00e3o)\\b', 'i');
+const PT_TEXT = /\.(?:md|markdown|mjs|cjs|js|py|sh|ya?ml|json|txt|html|tpl|toml|cfg|conf|ini)$/i;
 function internalIds(tree, check = assert.ok) {
   function walk(dir) {
     for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
@@ -116,11 +125,20 @@ function internalIds(tree, check = assert.ok) {
       if (/^(?:go\.mod|go\.sum)$/.test(entry.name)) continue;
       const text = fs.readFileSync(full, 'utf8');
       const rel = path.relative(tree, full);
+      // A full OpenPGP fingerprint (ten groups of four hex digits, as GnuPG prints
+      // it, possibly wrapped across lines) is a public key identifier, not a
+      // ticket: only that exact shape is dropped before the ticket scan, so a
+      // ticket elsewhere on the line, or on any line that merely mentions PGP,
+      // is still refused.
+      const scanTickets = text.replace(/\b(?:[0-9A-F]{4}\s{1,3}){9}[0-9A-F]{4}\b/g, '');
       check(!INTERNAL_CHANGE.test(text), `${rel}: no internal change ID`);
-      check(!INTERNAL_TICKET.test(text), `${rel}: no internal ticket number`);
+      check(!INTERNAL_TICKET.test(scanTickets), `${rel}: no internal ticket number`);
       check(!INTERNAL_SESSION.test(text), `${rel}: no internal session name`);
       check(!INTERNAL_FEATURE.test(text), `${rel}: no internal feature or F-session ID`);
       check(!INTERNAL_ROLE.test(text), `${rel}: no internal role name`);
+      if (PT_TEXT.test(entry.name)) {
+        check(!PT_ACCENTED.test(text) && !PT_WORDS.test(text), `${rel}: English only (no Portuguese text)`);
+      }
     }
   }
   walk(tree);

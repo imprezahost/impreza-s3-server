@@ -33,6 +33,7 @@ func function(root, file, name string) string {
 	fail("missing function %s", name)
 	return ""
 }
+
 func main() {
 	root, err := filepath.Abs(".")
 	if err != nil {
@@ -49,12 +50,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for _, optin := range []bool{false, true} {
+	for _, opt_in := range []bool{false, true} {
 		ctx := build.Default
 		ctx.GOOS = "linux"
 		ctx.GOARCH = "amd64"
 		ctx.BuildTags = []string{"kqueue"}
-		if optin {
+		if opt_in {
 			ctx.BuildTags = append(ctx.BuildTags, "minio_console")
 		}
 		found := 0
@@ -91,7 +92,7 @@ func main() {
 		if found != 0 {
 			fail("legacy Console remains with old build tag")
 		}
-		fmt.Printf("PASS: linux/amd64 source selection minio_console=%v Console imports=%d\n", optin, found)
+		fmt.Printf("PASS: linux/amd64 source selection minio_console=%v Console imports=%d\n", opt_in, found)
 	}
 	// Execute the exact three updater functions in
 	// a stdlib-only package. This does not certify their full server integration.
@@ -107,10 +108,10 @@ func main() {
 	for _, n := range []string{"TestInPlaceUpdateMechanicsDisabled"} {
 		test += function(root, "update_disabled_test.go", n) + "\n"
 	}
-	if err = os.WriteFile(filepath.Join(tmp, "boundary.go"), []byte(source), 0600); err != nil {
+	if err = os.WriteFile(filepath.Join(tmp, "boundary.go"), []byte(source), 0o600); err != nil {
 		panic(err)
 	}
-	if err = os.WriteFile(filepath.Join(tmp, "boundary_test.go"), []byte(test), 0600); err != nil {
+	if err = os.WriteFile(filepath.Join(tmp, "boundary_test.go"), []byte(test), 0o600); err != nil {
 		panic(err)
 	}
 	cmd := exec.Command("go", "test", "-v", "boundary.go", "boundary_test.go")

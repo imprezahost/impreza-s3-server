@@ -489,7 +489,6 @@ func serverHandleEarlyEnvVars() {
 		logger.Info("WARNING: MINIO_BROWSER=on ignored: the legacy browser Console has been removed")
 		globalBrowserEnabled = false
 	}
-
 }
 
 func serverHandleEnvVars() {

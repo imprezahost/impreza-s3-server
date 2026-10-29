@@ -6,8 +6,41 @@ production rollout are separate states. A source commit is not evidence that a
 running service has been updated. Private reports use the channel in
 [SECURITY.md](../SECURITY.md).
 
-From advisory to signed release: **a definir pelo mantenedor**. No response,
-remediation or release deadline is promised by this document.
+From advisory to signed release, counted from an upstream security advisory:
+- **critical or high severity:** a signed release within **14 days**. When no
+  fix is possible within that window, SECURITY.md and the README carry an
+  advisory with the mitigation for **every** configuration;
+- **medium or low severity:** in the next release, within **45 days**.
+
+Every release depends on the maintainer's offline signature; the clock above
+is the policy this fork commits to, not a promise that a signature can be
+produced while its holder is unavailable.
+
+## Release procedure (rN tags)
+
+The release workflow runs only for an **annotated** `r<number>` tag whose
+message carries an `Upstream-Base: <40-hex>` line; the workflow checks that
+the tag points at a commit on `main` and which toolchain `go.mod` pins. The
+lightweight tags of the repository's early history do not satisfy it and are
+kept as-is; the first real release is the next annotated tag. To release:
+
+1. create the annotated tag on `main`, with the upstream base as its own
+   message line: `git tag -a rN -m "rN" -m "Upstream-Base: <40-hex upstream commit>"`;
+2. push the tag: the workflow builds twice per architecture, byte-compares,
+   runs govulncheck and leaves an **unsigned draft** release;
+3. rebuild the same commit locally with the recorded recipe and compare the
+   bytes against the draft;
+4. the maintainer signs offline (the signature never passes through CI);
+5. publish the release with SHA256SUMS, and publish the signing key's
+   fingerprint through the documentation and the onion mirror.
+
+## Disabled CI coverage
+
+The workflows disabled before runner allocation — healing, replication,
+root-lockdown, historical-format upgrade and the resiliency rig — need
+fork-owned client/fixture inputs that the upstream rigs (removed with the
+container distribution) used to provide. A skipped workflow is missing
+coverage, not a pass; each names what is lost in its own file.
 
 ## Sources and triage
 

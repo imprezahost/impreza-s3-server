@@ -2,8 +2,10 @@
 
 ## Report a vulnerability privately
 
-**Reporting channel: open a support ticket at https://portal.imprezahost.com/submitticket.php**
-(the portal is also reachable over its onion address). Mark it as a security report.
+**Reporting channel: email <support@imprezahost.com>** — preferably
+[encrypted](#encrypt-a-report-optional) to the support key below. A support
+ticket at https://portal.imprezahost.com/submitticket.php (also reachable
+over its onion address) is an alternative; mark it as a security report.
 
 Do not post exploit details or sensitive information in public issues.
 
@@ -12,12 +14,41 @@ expected behavior and a minimal reproduction with synthetic data. Omit credentia
 access keys, customer data, private endpoints and identifying infrastructure details.
 The maintainer will arrange any sensitive evidence through the selected channel.
 
+## Encrypt a report (optional)
+
+Reports to <support@imprezahost.com> can be encrypted to the Impreza
+support key — an OpenPGP key generated offline by the maintainer and kept
+apart from service and release-signing keys.
+
+- User ID: `Impreza Support <support@imprezahost.com>`
+- Primary key: Ed25519 (certifies and signs); encryption subkey: Cv25519
+- Fingerprint: `FD4A F833 BBA6 D9B8 B890  B1AE 8BF2 4F8D E8F9 50F9`
+- Expires: 2029-10-29
+- Public key block: [SECURITY-KEY.asc](SECURITY-KEY.asc) in this repository
+
+**Verify the fingerprint through two independent channels before
+trusting it:** compare the fingerprint above with the copy served at
+`https://docs.imprezahost.com/.well-known/security-key.asc`. Only encrypt
+when both match.
+
+Encrypt with GnuPG and send the ASCII-armored result by mail:
+
+```sh
+gpg --import SECURITY-KEY.asc
+gpg --armor --encrypt --recipient FD4AF833BBA6D9B8B890B1AE8BF24F8DE8F950F9 report.txt
+```
+
+The key is not published to third-party keyservers.
+
 ## Handling and updates
 
 The maintainer will assess impact, reproduce reports in isolation and coordinate
-fixes and disclosure with reporters. No response deadline or support window is
-promised before the public maintenance policy is announced. Availability of source
-or a reproducible build does not mean a report has been resolved.
+fixes and disclosure with reporters. Response and release expectations follow the
+[maintenance policy](docs/MAINTENANCE.md): a signed release within 14 days for
+critical or high severity (or a published advisory with the mitigation), and
+within 45 days for medium or low. Every release depends on the maintainer's
+offline signature. Availability of source or a reproducible build does not mean
+a report has been resolved.
 
 Use releases and checksums announced by this fork's maintainer. Upstream update
 feeds do not identify this fork. The build recipe requires Go 1.26.10 and the

@@ -45,6 +45,13 @@ linters:
         text: should have a package comment
       - path: (.+)\.go$
         text: error strings should not be capitalized or end with punctuation or a newline
+      # Package names inherited from upstream (crypto, config, color, api...)
+      # that this fork does not rename: renaming them would be a wide,
+      # no-reader-value drift over inherited code.
+      - path: (.+)\.go$
+        text: avoid package names that conflict with Go standard library
+      - path: (.+)\.go$
+        text: avoid meaningless package names
     paths:
       - third_party$
       - builtin$

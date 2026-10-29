@@ -2,3 +2,6 @@
 /go.mod text eol=lf
 /go.sum text eol=lf
 /engineering/build/dependency-lock.sha256 text eol=lf
+# The published public key is byte-exact from the maintainer's export; no
+# line-ending conversion on any checkout platform.
+/SECURITY-KEY.asc text eol=lf

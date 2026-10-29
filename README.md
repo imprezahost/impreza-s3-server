@@ -79,10 +79,11 @@ point. The source tree also includes inherited technical documentation under `do
 
 ## Support and security
 
-The maintainer will select the public support and private security-reporting
-channels before publication. Until then, no reporting address is advertised.
-Do not put credentials, access keys, customer data or exploit details in public issues.
-See [SECURITY.md](SECURITY.md).
+Security reports go to <support@imprezahost.com>, preferably encrypted to
+the support OpenPGP key (`FD4A F833 BBA6 D9B8 B890  B1AE 8BF2 4F8D E8F9
+50F9`); [SECURITY.md](SECURITY.md) has the key, the fingerprint check and
+the encryption instructions. Do not put credentials, access keys, customer
+data or exploit details in public issues.
 
 ## License and attribution
 

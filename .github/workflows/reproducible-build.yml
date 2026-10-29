@@ -29,9 +29,15 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      # setup-go reads only the go directive, not the toolchain line; build.sh
+      # pins GOTOOLCHAIN=local and refuses any other version, so the exact
+      # toolchain is derived here from go.mod (setup-go wants the bare
+      # version, without the go prefix) — still the single Go source.
+      - name: Go toolchain from go.mod
+        run: echo "GO_TOOLCHAIN=$(sed -n 's/^toolchain go//p' go.mod)" >> "$GITHUB_ENV"
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_TOOLCHAIN }}
       # build.sh is offline (GOPROXY=off) and needs the modules already in the cache; a fresh runner has none.
       # Fetched here through the default proxy, each module checked against go.sum and sum.golang.org.
       - name: Download modules A
@@ -60,9 +66,15 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+      # setup-go reads only the go directive, not the toolchain line; build.sh
+      # pins GOTOOLCHAIN=local and refuses any other version, so the exact
+      # toolchain is derived here from go.mod (setup-go wants the bare
+      # version, without the go prefix) — still the single Go source.
+      - name: Go toolchain from go.mod
+        run: echo "GO_TOOLCHAIN=$(sed -n 's/^toolchain go//p' go.mod)" >> "$GITHUB_ENV"
       - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
         with:
-          go-version-file: go.mod
+          go-version: ${{ env.GO_TOOLCHAIN }}
       # build.sh is offline (GOPROXY=off) and needs the modules already in the cache; a fresh runner has none.
       # Fetched here through the default proxy, each module checked against go.sum and sum.golang.org.
       - name: Download modules B

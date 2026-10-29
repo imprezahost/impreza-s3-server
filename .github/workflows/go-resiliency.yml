@@ -17,6 +17,9 @@ permissions:
 
 jobs:
   build:
+    # DISABLED: the resiliency rig and its make target left with the container
+    # distribution; this workflow needs fork-owned fixtures before it can run.
+    if: ${{ false }}
     name: Go from go.mod on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:

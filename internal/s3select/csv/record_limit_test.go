@@ -28,7 +28,7 @@ import (
 
 // CVE-2026-39414: a CSV record longer than the S3 Select limit (1 MiB) must be refused with
 // OverMaxRecordSize instead of being buffered without bound. The literal 1<<20 keeps this test compiling on the
-// unpatched base, where it fails on behaviour (the oversized record is read as an ordinary row).
+// unpatched base, where it fails on behavior (the oversized record is read as an ordinary row).
 const selectRecordLimit = 1 << 20
 
 func readAllCSVRecords(t *testing.T, content string) error {
