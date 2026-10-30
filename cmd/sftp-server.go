@@ -28,9 +28,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/logger"
 	xldap "github.com/minio/pkg/v3/ldap"
 	xsftp "github.com/minio/pkg/v3/sftp"
 	"github.com/pkg/sftp"

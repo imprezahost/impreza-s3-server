@@ -25,8 +25,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/minio/minio/internal/auth"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 // GetObjectAttributes lets a replication peer read SSE-C attributes without

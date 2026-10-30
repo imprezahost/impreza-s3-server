@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/minio/minio/internal/bpool"
+	"github.com/imprezahost/impreza-s3-server/internal/bpool"
 )
 
 const defaultFlushInterval = time.Duration(100) * time.Millisecond

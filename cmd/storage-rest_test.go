@@ -26,7 +26,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/grid"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

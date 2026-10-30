@@ -25,8 +25,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/auth"
 	"github.com/minio/mux"
 	xldap "github.com/minio/pkg/v3/ldap"
 	"github.com/minio/pkg/v3/policy"

@@ -27,11 +27,11 @@ import (
 	"sync"
 
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/color"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/config/storageclass"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/color"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config/storageclass"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/pkg/v3/sync/errgroup"
 )
 

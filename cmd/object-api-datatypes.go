@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	"github.com/imprezahost/impreza-s3-server/internal/hash"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/bucket/replication"
-	"github.com/minio/minio/internal/hash"
 )
 
 //go:generate msgp -file $GOFILE -io=false -tests=false -unexported=false

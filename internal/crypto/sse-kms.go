@@ -25,10 +25,10 @@ import (
 	"path"
 	"strings"
 
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	jsoniter "github.com/json-iterator/go"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/kms"
-	"github.com/minio/minio/internal/logger"
 )
 
 type ssekms struct{}

@@ -30,10 +30,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/bucket/replication"
-	"github.com/minio/minio/internal/crypto"
-	xhttp "github.com/minio/minio/internal/http"
 )
 
 //go:generate msgp -file=$GOFILE

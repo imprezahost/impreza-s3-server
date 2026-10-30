@@ -29,12 +29,12 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/config"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/kms"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/v3/sync/errgroup"
 	"github.com/puzpuzpuz/xsync/v3"
 )

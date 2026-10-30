@@ -36,9 +36,9 @@ import (
 	"time"
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
-	"github.com/minio/minio/internal/arn"
-	"github.com/minio/minio/internal/config"
-	jwtm "github.com/minio/minio/internal/jwt"
+	"github.com/imprezahost/impreza-s3-server/internal/arn"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	jwtm "github.com/imprezahost/impreza-s3-server/internal/jwt"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

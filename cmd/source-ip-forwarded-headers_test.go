@@ -16,7 +16,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/minio/minio/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
 )
 
 // With the default configuration, a client cannot choose aws:SourceIp with X-Forwarded-For, X-Real-IP or

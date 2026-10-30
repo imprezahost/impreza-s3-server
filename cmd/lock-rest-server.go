@@ -21,9 +21,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/minio/minio/internal/dsync"
-	"github.com/minio/minio/internal/grid"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/dsync"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 )
 
 // To abstract a node over network.

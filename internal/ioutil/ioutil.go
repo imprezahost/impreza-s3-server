@@ -28,8 +28,8 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/bpool"
-	"github.com/minio/minio/internal/disk"
+	"github.com/imprezahost/impreza-s3-server/internal/bpool"
+	"github.com/imprezahost/impreza-s3-server/internal/disk"
 )
 
 // Block sizes constant.

@@ -36,11 +36,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/hash/sha256"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/minio/minio-go/v7/pkg/s3utils"
 	"github.com/minio/minio-go/v7/pkg/set"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
 )
 
 // AWS Signature Version '4' constants.

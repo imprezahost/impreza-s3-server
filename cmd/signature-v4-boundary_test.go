@@ -16,9 +16,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/auth"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/minio/pkg/v3/policy"
 )
 

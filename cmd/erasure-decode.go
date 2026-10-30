@@ -25,7 +25,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	xioutil "github.com/minio/minio/internal/ioutil"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 )
 
 // Reads in parallel from readers.

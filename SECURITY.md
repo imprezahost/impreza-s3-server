@@ -1,5 +1,7 @@
 # Security policy
 
+This policy covers Impreza S3 Server, a fork of MinIO (AGPLv3).
+
 ## Report a vulnerability privately
 
 **Reporting channel: email <support@imprezahost.com>** — preferably
@@ -50,7 +52,7 @@ within 45 days for medium or low. Every release depends on the maintainer's
 offline signature. Availability of source or a reproducible build does not mean
 a report has been resolved.
 
-Use releases and checksums announced by this fork's maintainer. Upstream update
+Use the `rN` releases, checksums and signatures announced by this fork's maintainer. Upstream update
 feeds do not identify this fork. The build recipe requires Go 1.26.10 and the
 tracked dependency lock. Check both source and executable with a current,
 independently obtained vulnerability database, recording its timestamp.

@@ -25,13 +25,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/minio/madmin-go/v3"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"github.com/minio/minio/internal/bucket/replication"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/kms"
 )
 
 const (

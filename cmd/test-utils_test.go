@@ -58,13 +58,13 @@ import (
 
 	"github.com/fatih/color"
 
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/hash"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/minio-go/v7/pkg/s3utils"
 	"github.com/minio/minio-go/v7/pkg/signer"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )

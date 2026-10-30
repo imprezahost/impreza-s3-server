@@ -18,7 +18,7 @@
 package ldap
 
 import (
-	"github.com/minio/minio/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
 )
 
 // LegacyConfig contains AD/LDAP server connectivity information from old config

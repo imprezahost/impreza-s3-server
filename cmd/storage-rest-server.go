@@ -33,16 +33,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/minio/minio/internal/grid"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
 	"github.com/tinylib/msgp/msgp"
 
 	jwtreq "github.com/golang-jwt/jwt/v4/request"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	xjwt "github.com/imprezahost/impreza-s3-server/internal/jwt"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/config"
-	xhttp "github.com/minio/minio/internal/http"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	xjwt "github.com/minio/minio/internal/jwt"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/mux"
 	xnet "github.com/minio/pkg/v3/net"
 )

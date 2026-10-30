@@ -24,9 +24,9 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/minio/minio/internal/bpool"
-	"github.com/minio/minio/internal/s3select/jstream"
-	"github.com/minio/minio/internal/s3select/sql"
+	"github.com/imprezahost/impreza-s3-server/internal/bpool"
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/jstream"
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/sql"
 )
 
 // PReader - JSON record reader for S3Select.

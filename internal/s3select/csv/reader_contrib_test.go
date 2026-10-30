@@ -26,8 +26,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/sql"
 	"github.com/klauspost/compress/zip"
-	"github.com/minio/minio/internal/s3select/sql"
 )
 
 func TestRead(t *testing.T) {

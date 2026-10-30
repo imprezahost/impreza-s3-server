@@ -24,7 +24,7 @@ import (
 	"runtime"
 	"syscall"
 
-	xioutil "github.com/minio/minio/internal/ioutil"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 )
 
 // Type of service signals currently supported.

@@ -23,8 +23,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/cachevalue"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/minio/minio/internal/cachevalue"
 )
 
 const (

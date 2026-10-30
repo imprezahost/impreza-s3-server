@@ -26,7 +26,7 @@ import (
 	"testing"
 
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/bpool"
+	"github.com/imprezahost/impreza-s3-server/internal/bpool"
 )
 
 func TestNewParallelReaderUsesPooledStashBuffer(t *testing.T) {

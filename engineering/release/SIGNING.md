@@ -1,7 +1,7 @@
 # Signing a release (maintainer, outside CI)
 
 The `rN` tag workflow (`.github/workflows/release.yml`) leaves an **unsigned draft** GitHub Release with
-`minio-linux-amd64`, `minio-linux-arm64`, `SHA256SUMS` and `BUILDINFO.txt`. CI never signs and never sees the
+`impreza-s3-server-linux-amd64`, `impreza-s3-server-linux-arm64`, `SHA256SUMS` and `BUILDINFO.txt`. CI never signs and never sees the
 private key. This is the maintainer's part: rebuild, compare, sign, attach, publish. Replace `<owner>/<repo>`, `rN`
 and the paths below; nothing here contains a key.
 
@@ -17,7 +17,7 @@ git push origin rN
 ## 1. Download the draft
 ```sh
 gh release download rN --repo <owner>/<repo> --dir rN \
-  --pattern 'minio-linux-*' --pattern SHA256SUMS --pattern BUILDINFO.txt
+  --pattern 'impreza-s3-server-linux-*' --pattern SHA256SUMS --pattern BUILDINFO.txt
 (cd rN && sha256sum --check SHA256SUMS)
 ```
 This only proves the files match the sums next to them. The next step is what makes them trustworthy.
@@ -36,7 +36,7 @@ for arch in amd64 arm64; do
   GOARCH=$arch bash engineering/build/build.sh "$PWD" "$PWD/../build-a-$arch" "$S3_GO" "$S3_CACHE"
   GOARCH=$arch bash engineering/build/build.sh "$PWD" "$PWD/../build-b-$arch" "$S3_GO" "$S3_CACHE"
   bash engineering/build/compare.sh "$PWD/../build-a-$arch" "$PWD/../build-b-$arch"
-  (cd "../build-a-$arch" && sha256sum minio | sed "s/  minio$/  minio-linux-$arch/") >> ../local-SHA256SUMS
+  (cd "../build-a-$arch" && sha256sum impreza-s3-server | sed "s/  impreza-s3-server$/  impreza-s3-server-linux-$arch/") >> ../local-SHA256SUMS
 done
 cd "$RELEASE_WORKDIR" && diff local-SHA256SUMS rN/SHA256SUMS
 ```
@@ -49,14 +49,14 @@ by the minisign password.
 ```sh
 cd rN
 minisign -S -s /path/to/offline/impreza-s3-server.key -m SHA256SUMS -t "impreza-s3-server rN SHA256SUMS"
-minisign -S -s /path/to/offline/impreza-s3-server.key -m minio-linux-amd64 -t "impreza-s3-server rN linux/amd64"
-minisign -S -s /path/to/offline/impreza-s3-server.key -m minio-linux-arm64 -t "impreza-s3-server rN linux/arm64"
-for f in SHA256SUMS minio-linux-amd64 minio-linux-arm64; do minisign -V -p /path/to/impreza-s3-server.pub -m "$f"; done
+minisign -S -s /path/to/offline/impreza-s3-server.key -m impreza-s3-server-linux-amd64 -t "impreza-s3-server rN linux/amd64"
+minisign -S -s /path/to/offline/impreza-s3-server.key -m impreza-s3-server-linux-arm64 -t "impreza-s3-server rN linux/arm64"
+for f in SHA256SUMS impreza-s3-server-linux-amd64 impreza-s3-server-linux-arm64; do minisign -V -p /path/to/impreza-s3-server.pub -m "$f"; done
 ```
 
 ## 4. Attach and publish
 ```sh
-gh release upload rN --repo <owner>/<repo> SHA256SUMS.minisig minio-linux-amd64.minisig minio-linux-arm64.minisig
+gh release upload rN --repo <owner>/<repo> SHA256SUMS.minisig impreza-s3-server-linux-amd64.minisig impreza-s3-server-linux-arm64.minisig
 ```
 Publish the public key and this release's `SHA256SUMS` **outside GitHub** first (the documentation site and its onion
 service), so verifying a download never depends only on the same page that served it. Then publish the draft:

@@ -25,7 +25,7 @@ getdeps: ## fetch necessary dependencies
 	@echo "Installing golangci-lint $(GOLANGCI_VERSION)"
 	@GOTOOLCHAIN=local GOPROXY=https://proxy.golang.org GOSUMDB=sum.golang.org GOBIN="$(abspath $(GOLANGCI_DIR))" go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_VERSION)
 
-crosscompile: ## cross compile minio
+crosscompile: ## cross compile impreza-s3-server
 	@(env bash $(PWD)/buildscripts/cross-compile.sh)
 
 verifiers: lint check-gen
@@ -46,12 +46,12 @@ lint-fix: getdeps ## runs golangci-lint suite of linters with automatic fixes
 	@$(GOLANGCI) run --build-tags kqueue --timeout=10m --config ./.golangci.yml --fix
 
 check: test
-test: verifiers build ## builds minio, runs linters, tests
+test: verifiers build ## builds impreza-s3-server, runs linters, tests
 	@echo "Running unit tests"
 	@MINIO_API_REQUESTS_MAX=10000 CGO_ENABLED=0 go test -v -tags kqueue,dev ./...
 
 test-root-disable: install-race
-	@echo "Running minio root lockdown tests"
+	@echo "Running impreza-s3-server root lockdown tests"
 	@env bash $(PWD)/buildscripts/disable-root.sh
 
 test-ilm: install-race
@@ -67,7 +67,7 @@ test-pbac: install-race
 	@env bash $(PWD)/docs/iam/policies/pbac-tests.sh
 
 test-decom: install-race
-	@echo "Running minio decom tests"
+	@echo "Running impreza-s3-server decom tests"
 	@env bash $(PWD)/docs/distributed/decom.sh
 	@env bash $(PWD)/docs/distributed/decom-encrypted.sh
 	@env bash $(PWD)/docs/distributed/decom-encrypted-sse-s3.sh
@@ -75,17 +75,17 @@ test-decom: install-race
 	@env bash $(PWD)/docs/distributed/decom-encrypted-kes.sh
 
 test-versioning: install-race
-	@echo "Running minio versioning tests"
+	@echo "Running impreza-s3-server versioning tests"
 	@env bash $(PWD)/docs/bucket/versioning/versioning-tests.sh
 
 test-configfile: install-race
 	@env bash $(PWD)/docs/distributed/distributed-from-config-file.sh
 
 test-upgrade: install-race
-	@echo "Running minio upgrade tests"
+	@echo "Running impreza-s3-server upgrade tests"
 	@(env bash $(PWD)/buildscripts/minio-upgrade.sh)
 
-test-race: verifiers build ## builds minio, runs linters, tests (race)
+test-race: verifiers build ## builds impreza-s3-server, runs linters, tests (race)
 	@echo "Running unit tests under -race"
 	@(env bash $(PWD)/buildscripts/race.sh)
 
@@ -147,11 +147,11 @@ test-timeout: install-race ## test multipart
 	@echo "Test server timeout"
 	@(env bash $(PWD)/buildscripts/test-timeout.sh)
 
-verify: install-race ## verify minio various setups
+verify: install-race ## verify impreza-s3-server various setups
 	@echo "Verifying build with race"
 	@(env bash $(PWD)/buildscripts/verify-build.sh)
 
-verify-healing: install-race ## verify healing and replacing disks with minio binary
+verify-healing: install-race ## verify healing and replacing disks with impreza-s3-server binary
 	@echo "Verify healing build with race"
 	@(env bash $(PWD)/buildscripts/verify-healing.sh)
 	@(env bash $(PWD)/buildscripts/verify-healing-empty-erasure-set.sh)
@@ -172,20 +172,20 @@ verify-healing-inconsistent-versions: install-race ## verify resolving inconsist
 build-debugging:
 	@(env bash $(PWD)/docs/debugging/build.sh)
 
-build: checks build-debugging ## builds minio to $(PWD)
-	@echo "Building minio binary to './minio'"
-	@CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -tags kqueue -trimpath --ldflags "$(LDFLAGS)" -o $(PWD)/minio 1>/dev/null
+build: checks build-debugging ## builds impreza-s3-server to $(PWD)
+	@echo "Building impreza-s3-server binary to './impreza-s3-server'"
+	@CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build -tags kqueue -trimpath --ldflags "$(LDFLAGS)" -o $(PWD)/impreza-s3-server 1>/dev/null
 
-install-race: checks build-debugging ## builds minio to $(PWD)
-	@echo "Building minio binary with -race to './minio'"
-	@GORACE=history_size=7 CGO_ENABLED=1 go build -tags kqueue,dev -race -trimpath --ldflags "$(LDFLAGS)" -o $(PWD)/minio 1>/dev/null
-	@echo "Installing minio binary with -race to '$(GOPATH)/bin/minio'"
-	@mkdir -p $(GOPATH)/bin && cp -af $(PWD)/minio $(GOPATH)/bin/minio
+install-race: checks build-debugging ## builds impreza-s3-server to $(PWD)
+	@echo "Building impreza-s3-server binary with -race to './impreza-s3-server'"
+	@GORACE=history_size=7 CGO_ENABLED=1 go build -tags kqueue,dev -race -trimpath --ldflags "$(LDFLAGS)" -o $(PWD)/impreza-s3-server 1>/dev/null
+	@echo "Installing impreza-s3-server binary with -race to '$(GOPATH)/bin/impreza-s3-server'"
+	@mkdir -p $(GOPATH)/bin && cp -af $(PWD)/impreza-s3-server $(GOPATH)/bin/impreza-s3-server
 
-install: build ## builds minio and installs it to $GOPATH/bin.
-	@echo "Installing minio binary to '$(GOPATH)/bin/minio'"
-	@mkdir -p $(GOPATH)/bin && cp -af $(PWD)/minio $(GOPATH)/bin/minio
-	@echo "Installation successful. To learn more, try \"minio --help\"."
+install: build ## builds impreza-s3-server and installs it to $GOPATH/bin.
+	@echo "Installing impreza-s3-server binary to '$(GOPATH)/bin/impreza-s3-server'"
+	@mkdir -p $(GOPATH)/bin && cp -af $(PWD)/impreza-s3-server $(GOPATH)/bin/impreza-s3-server
+	@echo "Installation successful. To learn more, try \"impreza-s3-server --help\"."
 
 clean: ## cleanup all generated assets
 	@echo "Cleaning up all the generated files"
@@ -193,7 +193,7 @@ clean: ## cleanup all generated assets
 	@find . -name '*~' | xargs rm -fv
 	@find . -name '.#*#' | xargs rm -fv
 	@find . -name '#*#' | xargs rm -fv
-	@rm -rvf minio
+	@rm -rvf impreza-s3-server
 	@rm -rvf build
 	@rm -rvf release
 	@rm -rvf .verify*

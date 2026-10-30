@@ -20,9 +20,9 @@ package cmd
 import (
 	"time"
 
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/grid"
-	xioutil "github.com/minio/minio/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 )
 
 //msgp:clearomitted

@@ -18,8 +18,8 @@
 package logger
 
 import (
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/logger/target/http"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/logger/target/http"
 )
 
 // Legacy envs

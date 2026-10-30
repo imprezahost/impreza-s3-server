@@ -67,15 +67,15 @@ if command -v cygpath >/dev/null 2>&1; then export GOCACHE="$(cygpath -m "$OUT/g
 LDFLAGS="-s -w -buildid="
 # Provisional fork identity, derived from the exact source commit rather than wall clock.
 FORK_VERSION="impreza-s3-server.${COMMIT:0:12}"
-LDFLAGS+=" -X github.com/minio/minio/cmd.Version=$FORK_VERSION"
-LDFLAGS+=" -X github.com/minio/minio/cmd.CopyrightYear=2025"
-LDFLAGS+=" -X github.com/minio/minio/cmd.ReleaseTag=DEVELOPMENT"
-LDFLAGS+=" -X github.com/minio/minio/cmd.CommitID=$COMMIT"
-LDFLAGS+=" -X github.com/minio/minio/cmd.ShortCommitID=${COMMIT:0:12}"
-LDFLAGS+=" -X github.com/minio/minio/cmd.GOPATH= -X github.com/minio/minio/cmd.GOROOT="
-(cd "$SRC" && "$GO" mod verify >"$OUT/go-mod-verify.txt" && "$GO" build -tags kqueue -ldflags "$LDFLAGS" -o "$OUT/minio" .)
-(cd "$OUT" && "$GO" version -m minio) >"$OUT/minio.buildinfo.txt"
-(cd "$OUT" && sha256sum minio >minio.sha256)
+LDFLAGS+=" -X github.com/imprezahost/impreza-s3-server/cmd.Version=$FORK_VERSION"
+LDFLAGS+=" -X github.com/imprezahost/impreza-s3-server/cmd.CopyrightYear=2025"
+LDFLAGS+=" -X github.com/imprezahost/impreza-s3-server/cmd.ReleaseTag=DEVELOPMENT"
+LDFLAGS+=" -X github.com/imprezahost/impreza-s3-server/cmd.CommitID=$COMMIT"
+LDFLAGS+=" -X github.com/imprezahost/impreza-s3-server/cmd.ShortCommitID=${COMMIT:0:12}"
+LDFLAGS+=" -X github.com/imprezahost/impreza-s3-server/cmd.GOPATH= -X github.com/imprezahost/impreza-s3-server/cmd.GOROOT="
+(cd "$SRC" && "$GO" mod verify >"$OUT/go-mod-verify.txt" && "$GO" build -tags kqueue -ldflags "$LDFLAGS" -o "$OUT/impreza-s3-server" .)
+(cd "$OUT" && "$GO" version -m impreza-s3-server) >"$OUT/impreza-s3-server.buildinfo.txt"
+(cd "$OUT" && sha256sum impreza-s3-server >impreza-s3-server.sha256)
 {
 	echo "source_commit=$COMMIT"
 	echo 'upstream_commit=9e49d5e7a648f00e26f2246f4dc28e6b07f8c84a'
@@ -85,4 +85,4 @@ LDFLAGS+=" -X github.com/minio/minio/cmd.GOPATH= -X github.com/minio/minio/cmd.G
 	echo "go.sum.sha256=$(sha256sum "$SRC/go.sum" | cut -d' ' -f1)"
 	echo "ldflags=$LDFLAGS"
 } >"$OUT/build-params.txt"
-cat "$OUT/minio.sha256"
+cat "$OUT/impreza-s3-server.sha256"

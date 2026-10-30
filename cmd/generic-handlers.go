@@ -30,17 +30,17 @@ import (
 	"unicode"
 
 	"github.com/dustin/go-humanize"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
 	"github.com/minio/minio-go/v7/pkg/s3utils"
 	"github.com/minio/minio-go/v7/pkg/set"
-	"github.com/minio/minio/internal/grid"
 	xnet "github.com/minio/pkg/v3/net"
 
-	"github.com/minio/minio/internal/amztime"
-	"github.com/minio/minio/internal/config/dns"
-	"github.com/minio/minio/internal/crypto"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/mcontext"
+	"github.com/imprezahost/impreza-s3-server/internal/amztime"
+	"github.com/imprezahost/impreza-s3-server/internal/config/dns"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/mcontext"
 )
 
 const (

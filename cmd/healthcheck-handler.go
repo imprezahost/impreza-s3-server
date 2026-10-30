@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"time"
 
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/kms"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 )
 
 const unavailable = "offline"

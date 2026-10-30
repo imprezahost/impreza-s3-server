@@ -90,12 +90,12 @@ jobs:
           : > dist/SHA256SUMS
           : > dist/BUILDINFO.txt
           for arch in amd64 arm64; do
-            cp "art/build-a-$arch/minio" "dist/minio-linux-$arch"
+            cp "art/build-a-$arch/impreza-s3-server" "dist/impreza-s3-server-linux-$arch"
             want=$(head -n 1 "art/SHA256SUMS-$arch/SHA256SUMS" | cut -d ' ' -f 1)
-            got=$(sha256sum "dist/minio-linux-$arch" | cut -d ' ' -f 1)
+            got=$(sha256sum "dist/impreza-s3-server-linux-$arch" | cut -d ' ' -f 1)
             [ -n "$want" ] && [ "$want" = "$got" ] || { echo "::error::linux/$arch: the binary is not the one the two builds agreed on"; exit 1; }
-            (cd dist && sha256sum "minio-linux-$arch") >> dist/SHA256SUMS
-            { echo "== linux/$arch"; cat "art/build-a-$arch/build-params.txt" "art/build-a-$arch/minio.buildinfo.txt"; } >> dist/BUILDINFO.txt
+            (cd dist && sha256sum "impreza-s3-server-linux-$arch") >> dist/SHA256SUMS
+            { echo "== linux/$arch"; cat "art/build-a-$arch/build-params.txt" "art/build-a-$arch/impreza-s3-server.buildinfo.txt"; } >> dist/BUILDINFO.txt
           done
           (cd dist && sha256sum --check SHA256SUMS)
       - name: Create the draft
@@ -114,4 +114,4 @@ jobs:
             echo "published outside GitHub, not against this page alone."
           } > notes.md
           gh release create "$TAG" --draft --verify-tag --title "$TAG" --notes-file notes.md \
-            dist/minio-linux-amd64 dist/minio-linux-arm64 dist/SHA256SUMS dist/BUILDINFO.txt
+            dist/impreza-s3-server-linux-amd64 dist/impreza-s3-server-linux-arm64 dist/SHA256SUMS dist/BUILDINFO.txt

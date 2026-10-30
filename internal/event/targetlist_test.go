@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/store"
+	"github.com/imprezahost/impreza-s3-server/internal/store"
 )
 
 type ExampleTarget struct {

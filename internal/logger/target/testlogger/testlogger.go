@@ -34,9 +34,9 @@ import (
 	"sync/atomic"
 	"testing"
 
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	types "github.com/imprezahost/impreza-s3-server/internal/logger/target/loggertypes"
 	"github.com/minio/madmin-go/v3/logger/log"
-	"github.com/minio/minio/internal/logger"
-	types "github.com/minio/minio/internal/logger/target/loggertypes"
 )
 
 const (

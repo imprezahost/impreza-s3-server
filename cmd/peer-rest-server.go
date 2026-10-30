@@ -35,15 +35,15 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/bandwidth"
+	"github.com/imprezahost/impreza-s3-server/internal/event"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/pubsub"
 	"github.com/klauspost/compress/zstd"
 	"github.com/minio/madmin-go/v3"
 	"github.com/minio/madmin-go/v3/logger/log"
-	"github.com/minio/minio/internal/bucket/bandwidth"
-	"github.com/minio/minio/internal/event"
-	"github.com/minio/minio/internal/grid"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/pubsub"
 	"github.com/minio/mux"
 )
 

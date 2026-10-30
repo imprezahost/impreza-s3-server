@@ -21,7 +21,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/minio/minio/internal/lock"
+	"github.com/imprezahost/impreza-s3-server/internal/lock"
 )
 
 // AppendFile - appends the file "src" to the file "dst"

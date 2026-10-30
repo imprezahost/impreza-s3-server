@@ -28,9 +28,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/minio/minio/internal/dsync"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/lsync"
+	"github.com/imprezahost/impreza-s3-server/internal/dsync"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/lsync"
 )
 
 // local lock servers
@@ -319,7 +319,7 @@ func getSource(n int) string {
 	if ok {
 		filename = pathutil.Base(filename)
 		funcName = strings.TrimPrefix(runtime.FuncForPC(pc).Name(),
-			"github.com/minio/minio/cmd.")
+			"github.com/imprezahost/impreza-s3-server/cmd.")
 	} else {
 		filename = "<unknown>"
 		lineNum = 0

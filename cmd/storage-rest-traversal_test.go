@@ -32,8 +32,8 @@ import (
 	"testing"
 	"time"
 
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/minio/madmin-go/v3"
-	xhttp "github.com/minio/minio/internal/http"
 )
 
 // Paths that must never be accepted from an internode payload. Each is a

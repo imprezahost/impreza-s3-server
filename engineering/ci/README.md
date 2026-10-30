@@ -49,7 +49,7 @@ timestamp and findings for each run; a pinned scanner does not freeze the result
 - **Before anything builds:** it checks, through the API, that the tag points at a commit on `main`, that its message has
   one `Upstream-Base: <40-hex>` line, and which toolchain `go.mod` pins.
 - **Then** it reuses `reproducible-build.yml` (two builds per architecture, byte comparison) and `vulncheck.yml`.
-- **The draft:** a GitHub Release draft with `minio-linux-amd64`, `minio-linux-arm64`, `SHA256SUMS` and `BUILDINFO.txt`,
+- **The draft:** a GitHub Release draft with `impreza-s3-server-linux-amd64`, `impreza-s3-server-linux-arm64`, `SHA256SUMS` and `BUILDINFO.txt`,
   and notes naming the source commit, the upstream base and the toolchain.
 
 Its safety properties:

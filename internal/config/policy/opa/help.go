@@ -17,7 +17,7 @@
 
 package opa
 
-import "github.com/minio/minio/internal/config"
+import "github.com/imprezahost/impreza-s3-server/internal/config"
 
 // Help template for OPA policy feature.
 var (

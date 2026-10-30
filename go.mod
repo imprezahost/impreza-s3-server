@@ -1,4 +1,4 @@
-module github.com/minio/minio
+module github.com/imprezahost/impreza-s3-server
 
 go 1.26.0
 

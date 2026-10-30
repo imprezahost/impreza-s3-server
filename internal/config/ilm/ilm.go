@@ -20,7 +20,7 @@ package ilm
 import (
 	"strconv"
 
-	"github.com/minio/minio/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
 	"github.com/minio/pkg/v3/env"
 )
 

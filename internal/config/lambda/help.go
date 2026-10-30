@@ -18,8 +18,8 @@
 package lambda
 
 import (
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/event/target"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/event/target"
 )
 
 // Help template inputs for all lambda targets

@@ -1,6 +1,6 @@
 # Security maintenance
 
-This fork accepts security, build and maintenance changes within its documented
+Impreza S3 Server, a fork of MinIO (AGPLv3), accepts security, build and maintenance changes within its documented
 scope. Source changes, local proof, independent review, signed release and
 production rollout are separate states. A source commit is not evidence that a
 running service has been updated. Private reports use the channel in

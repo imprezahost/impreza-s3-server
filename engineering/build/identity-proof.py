@@ -67,7 +67,7 @@ def main():
     normalized = old.replace('cmd.Version=' + UPSTREAM_VERSION, 'cmd.Version=' + report['fork_version'])
     if normalized != new:
         raise ValueError('inputs differ beyond Version')
-    hashes = {name: digest(out / name / 'minio') for name in ('control', 'fork-a', 'fork-b')}
+    hashes = {name: digest(out / name / 'impreza-s3-server') for name in ('control', 'fork-a', 'fork-b')}
     if hashes['control'] == hashes['fork-a'] or hashes['fork-a'] != hashes['fork-b']:
         raise ValueError('identity effect or reproducibility not established')
     report.update(status='VERSION_ONLY_INPUT_CHANGE_PROVEN', executable_sha256=hashes,

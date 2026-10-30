@@ -34,9 +34,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/mcontext"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/mcontext"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

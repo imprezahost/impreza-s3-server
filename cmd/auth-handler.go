@@ -31,13 +31,13 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/etag"
-	"github.com/minio/minio/internal/hash"
-	xhttp "github.com/minio/minio/internal/http"
-	xjwt "github.com/minio/minio/internal/jwt"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/mcontext"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/etag"
+	"github.com/imprezahost/impreza-s3-server/internal/hash"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	xjwt "github.com/imprezahost/impreza-s3-server/internal/jwt"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/mcontext"
 	"github.com/minio/pkg/v3/policy"
 )
 

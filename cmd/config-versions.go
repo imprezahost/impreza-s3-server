@@ -18,15 +18,15 @@
 package cmd
 
 import (
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/config/compress"
-	xldap "github.com/minio/minio/internal/config/identity/ldap"
-	"github.com/minio/minio/internal/config/identity/openid"
-	"github.com/minio/minio/internal/config/notify"
-	"github.com/minio/minio/internal/config/policy/opa"
-	"github.com/minio/minio/internal/config/storageclass"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config/compress"
+	xldap "github.com/imprezahost/impreza-s3-server/internal/config/identity/ldap"
+	"github.com/imprezahost/impreza-s3-server/internal/config/identity/openid"
+	"github.com/imprezahost/impreza-s3-server/internal/config/notify"
+	"github.com/imprezahost/impreza-s3-server/internal/config/policy/opa"
+	"github.com/imprezahost/impreza-s3-server/internal/config/storageclass"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/pkg/v3/quick"
 )
 

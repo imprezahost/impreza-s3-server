@@ -18,7 +18,7 @@
 package logger
 
 import (
-	"github.com/minio/minio/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
 )
 
 // Help template for logger http and audit

@@ -25,8 +25,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/logger"
 )
 
 // From Veeam-SOSAPI_1.0_Document_v1.02d.pdf

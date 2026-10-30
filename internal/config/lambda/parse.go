@@ -23,10 +23,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/config/lambda/event"
-	"github.com/minio/minio/internal/config/lambda/target"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config/lambda/event"
+	"github.com/imprezahost/impreza-s3-server/internal/config/lambda/target"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/pkg/v3/env"
 	xnet "github.com/minio/pkg/v3/net"
 )

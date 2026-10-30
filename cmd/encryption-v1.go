@@ -35,14 +35,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/etag"
+	"github.com/imprezahost/impreza-s3-server/internal/hash"
+	"github.com/imprezahost/impreza-s3-server/internal/hash/sha256"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/kms-go/kes"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/etag"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/kms"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/sio"
 )
 

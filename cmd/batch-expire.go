@@ -29,10 +29,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/versioning"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/minio/minio-go/v7/pkg/tags"
-	"github.com/minio/minio/internal/bucket/versioning"
-	xhttp "github.com/minio/minio/internal/http"
-	xioutil "github.com/minio/minio/internal/ioutil"
 	"github.com/minio/pkg/v3/env"
 	"github.com/minio/pkg/v3/wildcard"
 	"github.com/minio/pkg/v3/workers"

@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 	"time"
 
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/klauspost/compress/gzip"
 	"github.com/minio/madmin-go/v3/logger/log"
-	xioutil "github.com/minio/minio/internal/ioutil"
 )
 
 func defaultFilenameFunc() string {

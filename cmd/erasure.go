@@ -29,9 +29,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/dsync"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/dsync"
-	xioutil "github.com/minio/minio/internal/ioutil"
 	"github.com/minio/pkg/v3/sync/errgroup"
 )
 

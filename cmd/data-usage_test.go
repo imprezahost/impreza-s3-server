@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/cachevalue"
+	"github.com/imprezahost/impreza-s3-server/internal/cachevalue"
 )
 
 type usageTestFile struct {

@@ -30,8 +30,8 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/minio/madmin-go/v3"
-	xioutil "github.com/minio/minio/internal/ioutil"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )

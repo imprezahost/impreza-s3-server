@@ -18,7 +18,7 @@
 package opa
 
 import (
-	"github.com/minio/minio/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
 )
 
 // Legacy OPA envs

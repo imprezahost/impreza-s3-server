@@ -28,10 +28,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/handlers"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/mcontext"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/handlers"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/mcontext"
 )
 
 var ldapPwdRegex = regexp.MustCompile("(^.*?)LDAPPassword=([^&]*?)(&(.*?))?$")
@@ -47,7 +47,7 @@ func redactLDAPPwd(s string) string {
 
 // getOpName sanitizes the operation name for mc
 func getOpName(name string) (op string) {
-	op = strings.TrimPrefix(name, "github.com/minio/minio/cmd.")
+	op = strings.TrimPrefix(name, "github.com/imprezahost/impreza-s3-server/cmd.")
 	op = strings.TrimSuffix(op, "Handler-fm")
 	op = strings.Replace(op, "objectAPIHandlers", "s3", 1)
 	op = strings.Replace(op, "adminAPIHandlers", "admin", 1)

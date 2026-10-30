@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/bucket/lifecycle"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/lifecycle"
 )
 
 func TestListObjectsVersionedFolders(t *testing.T) {

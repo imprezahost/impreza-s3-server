@@ -25,12 +25,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/minio/minio/internal/amztime"
-	"github.com/minio/minio/internal/bucket/lifecycle"
-	"github.com/minio/minio/internal/bucket/replication"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/amztime"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/lifecycle"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/hash/sha256"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/minio/pkg/v3/sync/errgroup"
 )
 

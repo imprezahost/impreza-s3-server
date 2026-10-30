@@ -17,7 +17,7 @@
 
 package drive
 
-import "github.com/minio/minio/internal/config"
+import "github.com/imprezahost/impreza-s3-server/internal/config"
 
 var (
 	// MaxTimeout is the max timeout for drive

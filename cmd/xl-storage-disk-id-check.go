@@ -31,11 +31,11 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/cachevalue"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/cachevalue"
-	"github.com/minio/minio/internal/grid"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/logger"
 )
 
 //go:generate stringer -type=storageMetric -trimprefix=storageMetric $GOFILE

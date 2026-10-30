@@ -25,8 +25,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/minio/minio/internal/auth"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 func TestAPIGetObjectAttributesAuthenticatesSSECKey(t *testing.T) {

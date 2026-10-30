@@ -20,7 +20,7 @@ package cmd
 import (
 	"testing"
 
-	"github.com/minio/minio/internal/bucket/replication"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
 )
 
 var replicatedInfosTests = []struct {

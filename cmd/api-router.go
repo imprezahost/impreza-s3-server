@@ -21,7 +21,7 @@ import (
 	"net"
 	"net/http"
 
-	xhttp "github.com/minio/minio/internal/http"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/wildcard"
 	"github.com/rs/cors"

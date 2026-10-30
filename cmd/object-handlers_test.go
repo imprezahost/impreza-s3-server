@@ -41,11 +41,11 @@ import (
 	"testing"
 
 	"github.com/dustin/go-humanize"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
-	ioutilx "github.com/minio/minio/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/hash/sha256"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	ioutilx "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 )
 
 // Type to capture different modifications to API request to simulate failure cases.

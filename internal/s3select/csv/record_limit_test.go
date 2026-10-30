@@ -23,7 +23,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/minio/minio/internal/s3select/sql"
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/sql"
 )
 
 // CVE-2026-39414: a CSV record longer than the S3 Select limit (1 MiB) must be refused with

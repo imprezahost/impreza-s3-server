@@ -24,8 +24,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/minio/minio/internal/config"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/minio/pkg/v3/policy"
 )

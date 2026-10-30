@@ -22,7 +22,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/minio/minio/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
 )
 
 func TestServerConfig(t *testing.T) {

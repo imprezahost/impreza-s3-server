@@ -25,9 +25,9 @@ import (
 	"io"
 	"sync"
 
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/ioutil"
-	"github.com/minio/minio/internal/ringbuffer"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/ringbuffer"
 )
 
 // Calculates bitrot in chunks and writes the hash into the stream.

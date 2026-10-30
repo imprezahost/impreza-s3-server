@@ -30,8 +30,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/minio/minio/internal/config"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 // Tests validate bucket LocationConstraint.

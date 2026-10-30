@@ -21,8 +21,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/hash"
 )
 
 var toAPIErrorTests = []struct {

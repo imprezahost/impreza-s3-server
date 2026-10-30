@@ -31,9 +31,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/minio/minio/internal/hash/sha256"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/hash/sha256"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 )
 
 func hashLogIf(ctx context.Context, err error) {

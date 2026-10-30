@@ -26,8 +26,8 @@ import (
 	"strings"
 
 	"github.com/cespare/xxhash/v2"
+	"github.com/imprezahost/impreza-s3-server/internal/config"
 	"github.com/minio/minio-go/v7/pkg/set"
-	"github.com/minio/minio/internal/config"
 	"github.com/minio/pkg/v3/ellipses"
 	"github.com/minio/pkg/v3/env"
 )

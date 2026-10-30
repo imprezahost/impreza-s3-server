@@ -25,7 +25,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/minio/minio/internal/deadlineconn"
+	"github.com/imprezahost/impreza-s3-server/internal/deadlineconn"
 )
 
 type acceptResult struct {

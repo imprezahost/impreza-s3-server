@@ -14,9 +14,9 @@ import (
 	"context"
 	"net/http"
 
-	objectreplication "github.com/minio/minio/internal/bucket/replication"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
+	objectreplication "github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/pkg/v3/policy"
 )
 

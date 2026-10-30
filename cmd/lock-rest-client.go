@@ -21,8 +21,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/minio/minio/internal/dsync"
-	"github.com/minio/minio/internal/grid"
+	"github.com/imprezahost/impreza-s3-server/internal/dsync"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
 )
 
 // lockRESTClient is authenticable lock REST client

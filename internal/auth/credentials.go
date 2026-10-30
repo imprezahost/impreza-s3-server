@@ -30,7 +30,7 @@ import (
 	"time"
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
-	"github.com/minio/minio/internal/jwt"
+	"github.com/imprezahost/impreza-s3-server/internal/jwt"
 )
 
 const (

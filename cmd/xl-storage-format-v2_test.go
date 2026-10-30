@@ -34,10 +34,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/lifecycle"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/klauspost/compress/zip"
 	"github.com/klauspost/compress/zstd"
-	"github.com/minio/minio/internal/bucket/lifecycle"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/tinylib/msgp/msgp"
 )
 

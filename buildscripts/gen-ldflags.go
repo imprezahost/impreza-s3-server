@@ -33,13 +33,13 @@ func genLDFlags(version string) string {
 	releaseTag, date := releaseTag(version)
 	copyrightYear := strconv.Itoa(date.Year())
 	ldflagsStr := "-s -w"
-	ldflagsStr += " -X github.com/minio/minio/cmd.Version=" + version
-	ldflagsStr += " -X github.com/minio/minio/cmd.CopyrightYear=" + copyrightYear
-	ldflagsStr += " -X github.com/minio/minio/cmd.ReleaseTag=" + releaseTag
-	ldflagsStr += " -X github.com/minio/minio/cmd.CommitID=" + commitID()
-	ldflagsStr += " -X github.com/minio/minio/cmd.ShortCommitID=" + commitID()[:12]
-	ldflagsStr += " -X github.com/minio/minio/cmd.GOPATH=" + os.Getenv("GOPATH")
-	ldflagsStr += " -X github.com/minio/minio/cmd.GOROOT=" + os.Getenv("GOROOT")
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.Version=" + version
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.CopyrightYear=" + copyrightYear
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.ReleaseTag=" + releaseTag
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.CommitID=" + commitID()
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.ShortCommitID=" + commitID()[:12]
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.GOPATH=" + os.Getenv("GOPATH")
+	ldflagsStr += " -X github.com/imprezahost/impreza-s3-server/cmd.GOROOT=" + os.Getenv("GOROOT")
 	return ldflagsStr
 }
 

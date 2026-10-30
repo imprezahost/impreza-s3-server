@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Offline verification. No provisioning, listener/service setup or credential acquisition.
-# Usage: verify-offline.sh <checkout> <NEW-output> <go> <module-cache> <govulncheck> <local-vulndb-dir> <built-minio>
+# Usage: verify-offline.sh <checkout> <NEW-output> <go> <module-cache> <govulncheck> <local-vulndb-dir> <built-impreza-s3-server>
 # Every step records its exit status; failure is reported after all checks, including the binary scan.
 set -euo pipefail
 SRC=${1:?}
@@ -9,7 +9,7 @@ GO=${3:?}
 MODCACHE=${4:?}
 VULN=${5:?}
 DB=${6:?}
-BIN=${7:?built minio binary}
+BIN=${7:?built impreza-s3-server binary}
 [ -f "$BIN" ] && [ ! -L "$BIN" ] || {
 	echo 'built binary required (regular file)' >&2
 	exit 2

@@ -30,12 +30,12 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/google/uuid"
+	"github.com/imprezahost/impreza-s3-server/internal/bpool"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/lifecycle"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	"github.com/imprezahost/impreza-s3-server/internal/config/storageclass"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/minio/minio/internal/bpool"
-	"github.com/minio/minio/internal/bucket/lifecycle"
-	"github.com/minio/minio/internal/bucket/replication"
-	"github.com/minio/minio/internal/config/storageclass"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/tinylib/msgp/msgp"
 )
 

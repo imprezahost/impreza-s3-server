@@ -25,9 +25,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/minio-go/v7/pkg/set"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/logger"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/auth"
-	objectlock "github.com/minio/minio/internal/bucket/object/lock"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	objectlock "github.com/imprezahost/impreza-s3-server/internal/bucket/object/lock"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 // setBucketDefaultRetention turns on Object Lock and versioning for bucket, with a 2-day default retention in

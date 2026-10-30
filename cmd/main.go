@@ -29,9 +29,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/color"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/cli"
-	"github.com/minio/minio/internal/color"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/pkg/v3/console"
 	"github.com/minio/pkg/v3/env"
 	"github.com/minio/pkg/v3/trie"

@@ -22,8 +22,8 @@ import (
 	"io"
 	"runtime"
 
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/minio/madmin-go/v3"
-	xioutil "github.com/minio/minio/internal/ioutil"
 )
 
 // guardedStorage rejects filesystem paths that arrive from an internode

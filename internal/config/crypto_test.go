@@ -23,7 +23,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/minio/minio/internal/kms"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 )
 
 var encryptDecryptTests = []struct {

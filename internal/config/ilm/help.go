@@ -17,7 +17,7 @@
 
 package ilm
 
-import "github.com/minio/minio/internal/config"
+import "github.com/imprezahost/impreza-s3-server/internal/config"
 
 const (
 	transitionWorkers = "transition_workers"

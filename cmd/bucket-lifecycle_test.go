@@ -23,8 +23,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/bucket/lifecycle"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/lifecycle"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 // TestParseRestoreObjStatus tests parseRestoreObjStatus

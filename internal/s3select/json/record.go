@@ -26,9 +26,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/jstream"
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/sql"
 	csv "github.com/minio/csvparser"
-	"github.com/minio/minio/internal/s3select/jstream"
-	"github.com/minio/minio/internal/s3select/sql"
 )
 
 // RawJSON is a byte-slice that contains valid JSON

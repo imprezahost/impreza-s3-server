@@ -32,12 +32,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
+	types "github.com/imprezahost/impreza-s3-server/internal/logger/target/loggertypes"
+	"github.com/imprezahost/impreza-s3-server/internal/once"
+	"github.com/imprezahost/impreza-s3-server/internal/store"
 	jsoniter "github.com/json-iterator/go"
-	xhttp "github.com/minio/minio/internal/http"
-	xioutil "github.com/minio/minio/internal/ioutil"
-	types "github.com/minio/minio/internal/logger/target/loggertypes"
-	"github.com/minio/minio/internal/once"
-	"github.com/minio/minio/internal/store"
 	xnet "github.com/minio/pkg/v3/net"
 	"github.com/valyala/bytebufferpool"
 )

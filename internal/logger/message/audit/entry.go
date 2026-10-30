@@ -24,8 +24,8 @@ import (
 
 	"github.com/minio/madmin-go/v3/logger/audit"
 
-	"github.com/minio/minio/internal/handlers"
-	xhttp "github.com/minio/minio/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/handlers"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 // Version - represents the current version of audit log structure.

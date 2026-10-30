@@ -28,11 +28,11 @@ import (
 	"path"
 	"time"
 
+	objectlock "github.com/imprezahost/impreza-s3-server/internal/bucket/object/lock"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/replication"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/minio-go/v7"
-	objectlock "github.com/minio/minio/internal/bucket/object/lock"
-	"github.com/minio/minio/internal/bucket/replication"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
 	"github.com/minio/mux"
 	"github.com/minio/pkg/v3/policy"
 )

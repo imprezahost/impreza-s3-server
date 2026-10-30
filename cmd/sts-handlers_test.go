@@ -36,13 +36,13 @@ import (
 	"testing"
 	"time"
 
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 	"github.com/klauspost/compress/zip"
 	"github.com/minio/madmin-go/v3"
 	"github.com/minio/minio-go/v7"
 	cr "github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/minio/minio-go/v7/pkg/set"
 	"github.com/minio/minio-go/v7/pkg/tags"
-	xhttp "github.com/minio/minio/internal/http"
 	"github.com/minio/pkg/v3/ldap"
 )
 

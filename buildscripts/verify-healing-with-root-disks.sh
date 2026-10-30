@@ -4,14 +4,14 @@ set -E
 set -o pipefail
 set -x
 
-if [ ! -x "$PWD/minio" ]; then
-	echo "minio executable binary not found in current directory"
+if [ ! -x "$PWD/impreza-s3-server" ]; then
+	echo "impreza-s3-server executable binary not found in current directory"
 	exit 1
 fi
 
 WORK_DIR="$(mktemp -d)"
 MINIO_CONFIG_DIR="$WORK_DIR/.minio"
-MINIO=("$PWD/minio" --config-dir "$MINIO_CONFIG_DIR" server)
+MINIO=("$PWD/impreza-s3-server" --config-dir "$MINIO_CONFIG_DIR" server)
 
 function start_minio() {
 	start_port=$1
@@ -82,7 +82,10 @@ function main() {
 }
 
 function cleanup() {
-	pkill minio
+	# The executable is impreza-s3-server (its process name truncates to 15 chars):
+	# match only this test's servers by their unique config directory, never every
+	# S3 server on the host.
+	pkill -f -- "--config-dir $MINIO_CONFIG_DIR"
 	sudo umount ${WORK_DIR}/mnt/disk{1..3}/
 	sudo rm /dev/minio-loopdisk*
 	rm -rf "$WORK_DIR"

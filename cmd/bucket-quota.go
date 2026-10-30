@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/cachevalue"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/cachevalue"
-	"github.com/minio/minio/internal/logger"
 )
 
 // BucketQuotaSys - map of bucket and quota configuration.

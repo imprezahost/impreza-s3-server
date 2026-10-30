@@ -32,10 +32,10 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/config/compress"
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
 	"github.com/klauspost/compress/s2"
-	"github.com/minio/minio/internal/auth"
-	"github.com/minio/minio/internal/config/compress"
-	"github.com/minio/minio/internal/crypto"
 	"github.com/minio/pkg/v3/trie"
 )
 

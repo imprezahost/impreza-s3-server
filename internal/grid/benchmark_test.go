@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/logger/target/testlogger"
+	"github.com/imprezahost/impreza-s3-server/internal/logger/target/testlogger"
 )
 
 func BenchmarkRequests(b *testing.B) {

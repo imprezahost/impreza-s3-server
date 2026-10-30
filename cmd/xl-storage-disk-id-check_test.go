@@ -120,7 +120,7 @@ func TestReadPartsEmptyPathListDoesNotLeakKeepAlive(t *testing.T) {
 func settleKeepAliveGoroutines(limit int, wait time.Duration) int {
 	deadline := time.Now().Add(wait)
 	for {
-		n := countGoroutinesCreatedBy("github.com/minio/minio/cmd.keepHTTPResponseAlive")
+		n := countGoroutinesCreatedBy("github.com/imprezahost/impreza-s3-server/cmd.keepHTTPResponseAlive")
 		if n <= limit || !time.Now().Before(deadline) {
 			return n
 		}

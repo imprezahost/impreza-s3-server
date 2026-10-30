@@ -50,9 +50,9 @@ jobs:
         with:
           name: build-a-${{ matrix.arch }}
           path: |
-            /tmp/out-a/minio
-            /tmp/out-a/minio.sha256
-            /tmp/out-a/minio.buildinfo.txt
+            /tmp/out-a/impreza-s3-server
+            /tmp/out-a/impreza-s3-server.sha256
+            /tmp/out-a/impreza-s3-server.buildinfo.txt
             /tmp/out-a/build-params.txt
             /tmp/out-a/go-mod-verify.txt
 
@@ -87,9 +87,9 @@ jobs:
         with:
           name: build-b-${{ matrix.arch }}
           path: |
-            /tmp/out-b/minio
-            /tmp/out-b/minio.sha256
-            /tmp/out-b/minio.buildinfo.txt
+            /tmp/out-b/impreza-s3-server
+            /tmp/out-b/impreza-s3-server.sha256
+            /tmp/out-b/impreza-s3-server.buildinfo.txt
             /tmp/out-b/build-params.txt
             /tmp/out-b/go-mod-verify.txt
 
@@ -116,8 +116,8 @@ jobs:
         run: bash engineering/build/compare.sh "$PWD/out-a" "$PWD/out-b"
       - name: SHA256SUMS artifact
         run: |
-          cp out-a/minio "minio-linux-${{ matrix.arch }}"
-          sha256sum "minio-linux-${{ matrix.arch }}" > SHA256SUMS
+          cp out-a/impreza-s3-server "impreza-s3-server-linux-${{ matrix.arch }}"
+          sha256sum "impreza-s3-server-linux-${{ matrix.arch }}" > SHA256SUMS
           cat out-a/build-params.txt >> SHA256SUMS
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

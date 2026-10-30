@@ -26,10 +26,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/kms"
 )
 
 const (

@@ -32,10 +32,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	"github.com/imprezahost/impreza-s3-server/internal/hash"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/crypto"
-	"github.com/minio/minio/internal/hash"
-	"github.com/minio/minio/internal/kms"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

@@ -24,7 +24,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/minio/minio/internal/s3select/sql"
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/sql"
 )
 
 func TestNewReader(t *testing.T) {

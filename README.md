@@ -1,8 +1,9 @@
-# impreza-s3-server
+# Impreza S3 Server
 
-A security maintenance fork for operators who need self-hosted, S3-compatible
-object storage with a pinned Go toolchain and reproducible build instructions.
-The project name is provisional.
+Impreza S3 Server is a fork of MinIO (AGPLv3): a security maintenance fork for
+operators who need self-hosted, S3-compatible object storage with a pinned Go
+toolchain and reproducible build instructions. The executable is
+`impreza-s3-server` and the Go module is `github.com/imprezahost/impreza-s3-server`.
 
 [![License: AGPLv3](https://img.shields.io/badge/license-AGPLv3-blue)](LICENSE)
 [![Documentation](https://img.shields.io/badge/docs-Impreza%20Host-blue)](https://docs.imprezahost.com/)
@@ -22,6 +23,15 @@ legacy opt-in build. S3 API access remains available. See
 [SECURITY.md](SECURITY.md) and [maintenance](docs/MAINTENANCE.md).
 This does not invalidate Console sessions in an old running binary. Publication
 and rollout are separate maintainer actions.
+
+## Compatibility with MinIO deployments
+
+The name changed; the server's interface did not. Environment variable names
+(`MINIO_*`), command-line flags and the on-disk data format are those of the MinIO
+release this fork derives from. An existing server moves to Impreza S3 Server by
+replacing the executable and the service unit that starts it; its data, configuration
+and credentials stay where they are. Code that imported packages from
+`github.com/minio/minio` must use the new module path.
 
 ## Security fixes
 
@@ -51,13 +61,21 @@ GOTOOLCHAIN=local GOMODCACHE="$S3_CACHE" GOPROXY=https://proxy.golang.org GOSUMD
 bash engineering/build/build.sh "$PWD" "$PWD/../s3-build-a" "$S3_GO" "$S3_CACHE"
 bash engineering/build/build.sh "$PWD" "$PWD/../s3-build-b" "$S3_GO" "$S3_CACHE"
 bash engineering/build/compare.sh "$PWD/../s3-build-a" "$PWD/../s3-build-b"
-(cd ../s3-build-a && sha256sum --check minio.sha256)
+(cd ../s3-build-a && sha256sum --check impreza-s3-server.sha256)
 ```
 
 Each output directory must be new and outside the checkout. Builds use the
 same clean source commit, dependency lock and toolchain, with separate build
-caches. The executable retains the historical filename `minio` for compatibility;
-its build metadata identifies this fork. See [build instructions](engineering/build/BUILDING.md).
+caches. The executable is `impreza-s3-server`; its build metadata identifies this
+fork. See [build instructions](engineering/build/BUILDING.md).
+
+## Releases
+
+Each release is an `rN` tag with Linux amd64 and arm64 executables, a `SHA256SUMS`
+file and the maintainer's signature, published as described in
+[signing a release](engineering/release/SIGNING.md). The older lightweight tags
+`r1-6aa26ab8f771`, `r2-6e9f993c4fa4` and `r4-29af40558eac` have GitHub releases with no
+executables or signatures attached; there is no `r3`.
 
 A locally generated checksum detects changes relative to that build. To verify
 a downloaded release, obtain the expected checksum and source commit independently

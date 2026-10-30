@@ -29,11 +29,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/crypto"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/minio/minio-go/v7/pkg/tags"
-	"github.com/minio/minio/internal/crypto"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/kms"
 	"github.com/minio/pkg/v3/env"
 	"github.com/minio/pkg/v3/workers"
 )

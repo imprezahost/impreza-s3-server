@@ -24,7 +24,7 @@ import (
 	"math"
 	"strings"
 
-	"github.com/minio/minio/internal/s3select/jstream"
+	"github.com/imprezahost/impreza-s3-server/internal/s3select/jstream"
 	"github.com/minio/simdjson-go"
 )
 

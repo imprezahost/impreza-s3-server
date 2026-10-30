@@ -20,8 +20,8 @@ package cmd
 import (
 	"strings"
 
-	"github.com/minio/minio/internal/bucket/versioning"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/versioning"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 )
 
 // BucketVersioningSys - policy subsystem.

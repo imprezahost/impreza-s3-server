@@ -1,4 +1,4 @@
-# Building the fork
+# Building Impreza S3 Server
 
 Use Bash, Git, checksum tools, Go 1.26.10 and an existing verified module cache.
 Prepare dependencies separately with the official module proxy and checksum database.
@@ -10,11 +10,11 @@ Run build.sh twice with separate, absent output directories and compare.sh on th
 results, as shown in the root README. Keep the exact compiler, source commit and
 module lock. Source commit IDs are embedded in the executable, so changing the
 commit changes its identity and generally its checksum even for equivalent trees.
-Build parameters and buildinfo are retained next to the executable.
+Build parameters and buildinfo are retained next to the executable, `impreza-s3-server`.
 
 The `Version` string is `impreza-s3-server.<12-character source commit>` and
-`ReleaseTag` is `DEVELOPMENT`. The name is provisional, with no public release
-number or release tag assigned. This intentionally identifies a source build:
+`ReleaseTag` is `DEVELOPMENT`, for `rN` releases too: the release tag is recorded
+in the release, not in the executable. This intentionally identifies a source build:
 the inherited update code classifies a non-RFC3339 Version as a source build and
 uses executable modification time for release-time comparisons. Do not interpret
 upstream update responses as authorization to replace this fork.

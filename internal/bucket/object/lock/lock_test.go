@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	xhttp "github.com/minio/minio/internal/http"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 func TestParseMode(t *testing.T) {

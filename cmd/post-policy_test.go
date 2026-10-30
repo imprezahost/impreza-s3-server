@@ -33,7 +33,7 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-	xhttp "github.com/minio/minio/internal/http"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 const (

@@ -30,12 +30,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/bucket/bandwidth"
+	"github.com/imprezahost/impreza-s3-server/internal/grid"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/rest"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/bucket/bandwidth"
-	"github.com/minio/minio/internal/grid"
-	xhttp "github.com/minio/minio/internal/http"
-	"github.com/minio/minio/internal/logger"
-	"github.com/minio/minio/internal/rest"
 	xnet "github.com/minio/pkg/v3/net"
 )
 

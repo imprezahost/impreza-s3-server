@@ -26,10 +26,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/config"
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/minio/minio-go/v7/pkg/set"
-	"github.com/minio/minio/internal/config"
-	"github.com/minio/minio/internal/kms"
 	"github.com/puzpuzpuz/xsync/v3"
 	"go.etcd.io/etcd/api/v3/mvccpb"
 	etcd "go.etcd.io/etcd/client/v3"

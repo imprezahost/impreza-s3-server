@@ -24,9 +24,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/minio/minio/internal/bpool"
-	"github.com/minio/minio/internal/hash/sha256"
-	xioutil "github.com/minio/minio/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/bpool"
+	"github.com/imprezahost/impreza-s3-server/internal/hash/sha256"
+	xioutil "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/tinylib/msgp/msgp"
 )
 

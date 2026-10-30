@@ -24,7 +24,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/minio/minio/internal/dsync"
+	"github.com/imprezahost/impreza-s3-server/internal/dsync"
 )
 
 // Helper function to create a lock server for testing

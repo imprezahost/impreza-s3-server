@@ -24,9 +24,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/minio/minio/internal/auth"
-	objectlock "github.com/minio/minio/internal/bucket/object/lock"
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
+	objectlock "github.com/imprezahost/impreza-s3-server/internal/bucket/object/lock"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/pkg/v3/policy"
 )
 

@@ -26,8 +26,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/imprezahost/impreza-s3-server/internal/kms"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/minio/minio/internal/kms"
 	"github.com/secure-io/sio-go"
 	"github.com/secure-io/sio-go/sioutil"
 )

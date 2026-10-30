@@ -30,9 +30,9 @@ import (
 	"time"
 
 	"github.com/beevik/ntp"
-	"github.com/minio/minio/internal/amztime"
+	"github.com/imprezahost/impreza-s3-server/internal/amztime"
 
-	"github.com/minio/minio/internal/logger"
+	"github.com/imprezahost/impreza-s3-server/internal/logger"
 	"github.com/minio/pkg/v3/env"
 )
 

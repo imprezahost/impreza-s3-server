@@ -25,7 +25,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/minio/minio/internal/ioutil"
+	"github.com/imprezahost/impreza-s3-server/internal/ioutil"
 )
 
 // Tests functions like Size(), MD5*(), SHA256*()

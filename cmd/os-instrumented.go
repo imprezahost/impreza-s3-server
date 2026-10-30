@@ -23,9 +23,9 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/imprezahost/impreza-s3-server/internal/disk"
+	ioutilx "github.com/imprezahost/impreza-s3-server/internal/ioutil"
 	"github.com/minio/madmin-go/v3"
-	"github.com/minio/minio/internal/disk"
-	ioutilx "github.com/minio/minio/internal/ioutil"
 )
 
 //go:generate stringer -type=osMetric -trimprefix=osMetric $GOFILE

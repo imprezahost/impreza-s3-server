@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/minio/minio/internal/auth"
+	"github.com/imprezahost/impreza-s3-server/internal/auth"
 )
 
 // The PutObjectRetention handler itself, not only isRetentionActionAllowed: a caller holding only

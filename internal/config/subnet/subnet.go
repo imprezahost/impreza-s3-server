@@ -27,7 +27,7 @@ import (
 	"net/http"
 	"time"
 
-	xhttp "github.com/minio/minio/internal/http"
+	xhttp "github.com/imprezahost/impreza-s3-server/internal/http"
 )
 
 const (
